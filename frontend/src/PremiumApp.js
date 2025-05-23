@@ -89,6 +89,40 @@ function PremiumApp() {
     };
   };
 
+  // Extract state from service area
+  const getStateFromServiceArea = (serviceArea) => {
+    if (!serviceArea) return '';
+    
+    // Common state patterns
+    const statePatterns = {
+      'NY': ['New York', 'NY', 'Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island'],
+      'CA': ['California', 'CA', 'Los Angeles', 'San Francisco', 'San Diego'],
+      'FL': ['Florida', 'FL', 'Miami', 'Orlando', 'Tampa'],
+      'IL': ['Illinois', 'IL', 'Chicago'],
+      'MA': ['Massachusetts', 'MA', 'Boston'],
+      'WA': ['Washington', 'WA', 'Seattle'],
+      'PA': ['Pennsylvania', 'PA', 'Philadelphia'],
+      'NJ': ['New Jersey', 'NJ', 'Jersey City']
+    };
+    
+    for (const [state, patterns] of Object.entries(statePatterns)) {
+      if (patterns.some(pattern => serviceArea.toLowerCase().includes(pattern.toLowerCase()))) {
+        return state;
+      }
+    }
+    
+    // Try to extract state from "City, State" format
+    const parts = serviceArea.split(',');
+    if (parts.length >= 2) {
+      const statePart = parts[parts.length - 1].trim();
+      if (statePart.length === 2) {
+        return statePart.toUpperCase();
+      }
+    }
+    
+    return '';
+  };
+
   // Fetch functions
   const fetchAgents = async () => {
     try {
