@@ -211,17 +211,57 @@ function App() {
       }
     } catch (error) {
       console.error('Error searching location:', error);
-      // Fallback to NYC if search fails
-      setViewport({
-        latitude: 40.7128,
-        longitude: -74.0060,
-        zoom: 10
-      });
     }
+  };
+
+  // Address autocomplete functionality
+  const handleSearchInput = async (value) => {
+    setSearchTerm(value);
+    
+    if (value.length > 2) {
+      try {
+        // Use Mapbox Geocoding API for address suggestions
+        const response = await fetch(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(value)}.json?access_token=${MAPBOX_TOKEN}&country=US&types=address,place,locality,neighborhood,district&limit=5`
+        );
+        const data = await response.json();
+        
+        if (data.features) {
+          const suggestions = data.features.map(feature => ({
+            id: feature.id,
+            place_name: feature.place_name,
+            center: feature.center, // [longitude, latitude]
+            place_type: feature.place_type
+          }));
+          setSearchSuggestions(suggestions);
+          setShowSuggestions(true);
+        }
+      } catch (error) {
+        console.error('Error fetching address suggestions:', error);
+        setSearchSuggestions([]);
+      }
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSelectSuggestion = (suggestion) => {
+    setSearchTerm(suggestion.place_name);
+    setShowSuggestions(false);
+    setSearchSuggestions([]);
+    
+    // Navigate to selected location
+    setViewport({
+      latitude: suggestion.center[1], // Mapbox returns [lng, lat]
+      longitude: suggestion.center[0],
+      zoom: 14
+    });
   };
 
   const handleCommitSearch = () => {
     if (searchTerm.trim()) {
+      setShowSuggestions(false);
       handleSearchLocation(searchTerm);
     }
   };
