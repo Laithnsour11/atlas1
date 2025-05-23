@@ -304,15 +304,7 @@ async def get_admin_tags(password: str = Query(..., description="Admin password"
     if password != ADMIN_PASSWORD:
         raise HTTPException(status_code=401, detail="Invalid password")
     
-    try:
-        # Get custom tags from database
-        result = supabase.table('tag_settings').select("tags").limit(1).execute()
-        if result.data and result.data[0].get('tags'):
-            return {"tags": result.data[0]['tags']}
-        else:
-            return {"tags": DEFAULT_TAGS}
-    except Exception as e:
-        return {"tags": DEFAULT_TAGS}
+    return {"tags": get_custom_tags()}
 
 @api_router.post("/admin/tags")
 async def update_admin_tags(tag_settings: TagSettings, password: str = Query(..., description="Admin password")):
@@ -329,9 +321,14 @@ async def update_admin_tags(tag_settings: TagSettings, password: str = Query(...
             if not tag.strip() or len(tag.strip()) < 2:
                 raise HTTPException(status_code=400, detail="Tags must be at least 2 characters long")
         
-        # Update or insert tag settings
-        result = supabase.table('tag_settings').upsert({"id": 1, "tags": tag_settings.tags}).execute()
-        return {"message": "Tags updated successfully", "tags": tag_settings.tags}
+        # Save tags
+        success = save_custom_tags(tag_settings.tags)
+        if success:
+            return {"message": "Tags updated successfully", "tags": tag_settings.tags}
+        else:
+            return {"message": "Tags saved to fallback storage", "tags": tag_settings.tags, "warning": "Database table not available"}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
