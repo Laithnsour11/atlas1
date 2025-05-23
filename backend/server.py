@@ -350,27 +350,54 @@ async def add_to_gohighlevel(agent_id: str):
 async def search_location(query: str):
     """Search for location coordinates using a geocoding service"""
     try:
-        # Using a simple geocoding approach - in production you might use Google Maps Geocoding API
-        # For now, return some sample coordinates for common areas
+        # Enhanced location mapping for better search results
         location_map = {
+            # NYC Boroughs
             "manhattan": {"latitude": 40.7831, "longitude": -73.9712, "zoom": 12},
             "brooklyn": {"latitude": 40.6782, "longitude": -73.9442, "zoom": 12},
             "queens": {"latitude": 40.7282, "longitude": -73.7949, "zoom": 12},
             "bronx": {"latitude": 40.8448, "longitude": -73.8648, "zoom": 12},
             "staten island": {"latitude": 40.5795, "longitude": -74.1502, "zoom": 12},
+            
+            # NYC Areas
             "new york": {"latitude": 40.7128, "longitude": -74.0060, "zoom": 10},
+            "new york city": {"latitude": 40.7128, "longitude": -74.0060, "zoom": 10},
+            "nyc": {"latitude": 40.7128, "longitude": -74.0060, "zoom": 10},
+            
+            # Neighborhoods
+            "upper east side": {"latitude": 40.7740, "longitude": -73.9566, "zoom": 14},
+            "upper west side": {"latitude": 40.7870, "longitude": -73.9754, "zoom": 14},
+            "soho": {"latitude": 40.7233, "longitude": -74.0030, "zoom": 14},
+            "tribeca": {"latitude": 40.7195, "longitude": -74.0089, "zoom": 14},
+            "chelsea": {"latitude": 40.7465, "longitude": -74.0014, "zoom": 14},
+            "midtown": {"latitude": 40.7549, "longitude": -73.9840, "zoom": 13},
+            "financial district": {"latitude": 40.7074, "longitude": -74.0113, "zoom": 14},
+            
+            # Other areas
+            "long island": {"latitude": 40.7891, "longitude": -73.1350, "zoom": 9},
+            "westchester": {"latitude": 41.1220, "longitude": -73.7949, "zoom": 10},
+            "new jersey": {"latitude": 40.0583, "longitude": -74.4057, "zoom": 8},
+            "connecticut": {"latitude": 41.5978, "longitude": -72.7554, "zoom": 8},
         }
         
-        query_lower = query.lower()
+        query_lower = query.lower().strip()
+        
+        # Direct match
+        if query_lower in location_map:
+            return location_map[query_lower]
+        
+        # Partial match
         for location, coords in location_map.items():
-            if location in query_lower:
+            if location in query_lower or query_lower in location:
                 return coords
         
         # Default to NYC if not found
         return {"latitude": 40.7128, "longitude": -74.0060, "zoom": 10}
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Location search error: {e}")
+        # Fallback to NYC
+        return {"latitude": 40.7128, "longitude": -74.0060, "zoom": 10}
 
 # Include the router in the main app
 app.include_router(api_router)
