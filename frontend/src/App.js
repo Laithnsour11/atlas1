@@ -48,6 +48,16 @@ function App() {
   useEffect(() => {
     fetchAgents();
     fetchPredefinedTags();
+    
+    // Hide suggestions when clicking outside
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.search-container')) {
+        setShowSuggestions(false);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   // Filter agents based on tags and viewport (not search)
