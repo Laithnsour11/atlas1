@@ -102,208 +102,208 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Build Atlas - a real estate professional directory app with search functionality, interactive map using Mapbox, professional profiles with ratings and comments, and community submission features. Must be embeddable as iframe and work standalone."
+user_problem_statement: "Enhanced Atlas - Real estate agent directory with focused agent-only listings, pre-populated tags system, conditional service area dropdowns, GoHighLevel CRM integration, image scraping, 'My Agents' view, smaller profile cards, map search functionality, heat map visualization, and optimized UI/UX."
 
 backend:
-  - task: "Supabase Database Integration"
+  - task: "Enhanced Agent API with New Schema"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Implemented Supabase client, created database models, and basic CRUD endpoints. Need to test connection and database operations."
-      - working: true
-        agent: "testing"
-        comment: "Database integration working perfectly. Successfully tested connection, CRUD operations, and data persistence. Database contains 6 professionals with full functionality."
+        comment: "Restructured from professionals to agents-only with mandatory fields: full_name, brokerage, phone, email, website, service_area_type, service_area, tags (array), address_last_deal, submitted_by, notes"
 
-  - task: "Professionals API Endpoints"
+  - task: "Predefined Tags System"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Created GET /api/professionals, POST /api/professionals, GET /api/professionals/{id} endpoints with search and filtering capabilities."
-      - working: true
-        agent: "testing"
-        comment: "All professionals API endpoints working correctly. Successfully tested create, read, search by name/company, and filter by type. All endpoints return proper JSON responses."
+        comment: "Created GET /api/tags endpoint with 20 predefined real estate tags. Frontend requires at least one tag selection"
 
-  - task: "Comments API Endpoints"
+  - task: "GoHighLevel CRM Integration"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Created POST /api/comments and GET /api/professionals/{id}/comments endpoints for rating and commenting system."
-      - working: true
-        agent: "testing"
-        comment: "Comments API working perfectly. Successfully tested creating comments with ratings (1-5 stars), retrieving comments for professionals, and proper data validation."
+        comment: "Added POST /api/ghl/add-contact endpoint with API key integration. Automatically adds agent contacts to GoHighLevel CRM"
 
-  - task: "Suggestions API Endpoint"
+  - task: "Image Scraping Functionality"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Created POST /api/suggestions endpoint for community submissions and suggestions."
-      - working: true
-        agent: "testing"
-        comment: "Suggestions API working correctly. Successfully tested creating suggestions with proper data validation and response handling."
+        comment: "Implemented website scraping and search-based image extraction for agent profile photos. No placeholders if no image found"
 
-  - task: "Geo-location Search"
+  - task: "Location Search API"
     implemented: true
-    working: false
+    working: "unknown"
     file: "/app/backend/server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Created GET /api/professionals/near endpoint for location-based search with radius filtering."
-      - working: false
-        agent: "testing"
-        comment: "Route order issue: /professionals/near conflicts with /professionals/{professional_id}. FastAPI matches 'near' as professional_id causing UUID validation errors. Need to reorder routes in server.py."
+        comment: "Added GET /api/search-location endpoint for map navigation to searched areas with zoom functionality"
+
+  - task: "Service Area Type Validation"
+    implemented: true
+    working: "unknown"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "unknown"
+        agent: "main"
+        comment: "Added conditional dropdown support with city/county/state validation and mandatory service area field"
 
 frontend:
-  - task: "Search and Filter Interface"
+  - task: "Enhanced Agent Cards - Smaller Design"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Implemented search bar with name/company/area filtering, type filters (agent/buyer/vendor), and specialty filtering."
-      - working: true
-        agent: "testing"
-        comment: "Search and filter interface working perfectly. Tested search by name (Sarah), type filtering (agent), and specialty filtering (residential). All filters update results correctly and work in combination. Search bar responsive and filters reset properly."
+        comment: "Redesigned agent cards to be more compact with profile images, condensed contact info, and tag display"
 
-  - task: "Professional Cards and List View"
+  - task: "Predefined Tags Interface"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Created beautiful professional cards with contact info, service areas, specialties, and ratings display."
-      - working: true
-        agent: "testing"
-        comment: "Professional cards displaying excellently. Cards show names, companies, contact info (phone/email), service areas as chips, specialties as colored tags, star ratings, and type badges. Hover effects work, cards are clickable, and layout is responsive. Currently showing 12 professionals with complete data."
+        comment: "Implemented tag filter buttons and mandatory tag selection in add agent form with checkbox interface"
 
-  - task: "Mapbox Integration and Map View"
+  - task: "My Agents View"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Integrated Mapbox with markers for professionals, navigation controls, and coordinated list/map interactions."
-      - working: true
-        agent: "testing"
-        comment: "Mapbox integration working perfectly. Map loads correctly with NYC area view, professional markers are visible and positioned accurately, navigation controls (zoom, pan) functional, and map coordinates with list view seamlessly. Map markers clickable and map view toggle works smoothly."
+        comment: "Added 'My Agents' toggle button to filter agents by submitted_by field for personalized view"
 
-  - task: "Professional Profile Modal"
+  - task: "GoHighLevel Reach Out Button"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Created detailed profile modal with contact info, service areas, rating display, and full professional details."
-      - working: true
-        agent: "testing"
-        comment: "Profile modal working excellently. Opens when clicking professional cards, displays complete contact information (phone, email, website), service areas as chips, professional details, and modal closes properly. Layout is clean and professional."
+        comment: "Added 'Reach Out' button in agent profile modal that automatically adds agent to GoHighLevel CRM"
 
-  - task: "Comments and Rating System"
+  - task: "Enhanced Add Agent Form"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Implemented comment submission form with star ratings, comment display, and real-time updates."
-      - working: true
-        agent: "testing"
-        comment: "Comments and rating system fully functional. Comments section displays correctly with count, comment submission form has name field and rating dropdown (1-5 stars), textarea for experience, and Post Comment button. Form submission works and integrates with backend API."
+        comment: "Updated form with mandatory fields: full_name, brokerage, phone, email, website, service_area_type/area, tags, address_last_deal, submitted_by"
 
-  - task: "Add Professional Form"
+  - task: "Map Search Integration"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Created modal form for adding new professionals with all required fields and service area/specialty arrays."
-      - working: true
-        agent: "testing"
-        comment: "Add Professional form working perfectly. Modal opens from 'Add Contact' button, contains all required fields (name, type, company, phone, email, website), service areas and specialties as comma-separated textareas, form validation, and submission works correctly. Form closes after submission and new professionals appear in list."
+        comment: "Search bar now navigates map to searched location and zooms to include nearest agents"
 
-  - task: "View Mode Toggle (List/Map/Both)"
+  - task: "Heat Map Visualization"
     implemented: true
-    working: true
+    working: "unknown"
     file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "unknown"
         agent: "main"
-        comment: "Implemented view mode toggle buttons to switch between list view, map view, and combined view."
-      - working: true
-        agent: "testing"
-        comment: "View mode toggle working flawlessly. Three buttons (list, both, map) switch views correctly. List view shows only professional cards, map view shows only Mapbox map, both view shows side-by-side layout. Active button highlighted with blue background, transitions smooth."
+        comment: "Added Mapbox heatmap layer showing comment density and agent coverage areas"
+
+  - task: "Fixed Map-Only View"
+    implemented: true
+    working: "unknown"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "unknown"
+        agent: "main"
+        comment: "Fixed map-only view to use full width when selected instead of split view"
+
+  - task: "Enhanced Profile Modal"
+    implemented: true
+    working: "unknown"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "unknown"
+        agent: "main"
+        comment: "Updated modal to show profile images, notes section, address of last deal, submitted by, and enhanced contact information"
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 1
+  version: "2.0"
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Geo-location Search"
-  stuck_tasks:
-    - "Geo-location Search"
-  test_all: false
+    - "Enhanced Agent API with New Schema"
+    - "Predefined Tags System"
+    - "GoHighLevel CRM Integration"
+    - "Enhanced Agent Cards - Smaller Design"
+    - "My Agents View"
+    - "Fixed Map-Only View"
+  stuck_tasks: []
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Completed initial Atlas implementation with Supabase backend, Mapbox frontend, and all core features. Database tables need to be created in Supabase dashboard (SQL provided to user). Ready for comprehensive backend testing to verify API endpoints and database connections."
-  - agent: "testing"
-    message: "Comprehensive backend testing completed. Core functionality working excellently with 4/5 major backend tasks passing. Supabase integration is solid, all CRUD operations working, search and filtering functional. One routing issue identified in geo-location search that needs route reordering fix."
-  - agent: "testing"
-    message: "Frontend testing completed successfully! All 7 frontend tasks are working perfectly. Comprehensive testing verified: search/filtering (name, type, specialty), professional cards with ratings and contact info, Mapbox integration with markers and navigation, profile modals with full details, comments/rating system with form submission, add professional form with all fields, and view mode toggles (list/map/both). Application displays 12 professionals with complete data. UI is responsive, professional, and all interactions work smoothly. Atlas is ready for production use."
+    message: "Completed major Atlas enhancement with agent-focused directory, GoHighLevel integration, enhanced UI/UX, and all requested features. Updated database schema to 'agents' table with new mandatory fields. Ready for comprehensive testing of enhanced functionality."
