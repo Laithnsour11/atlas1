@@ -504,11 +504,15 @@ def test_service_area_validation():
                                json=invalid_agent_data, 
                                timeout=10)
         
-        # Should accept any string for now, but endpoint should work
-        if response.status_code in [200, 400, 422]:
-            results.add_result("Service Area Validation (Invalid Type)", True, "Endpoint handles invalid types appropriately")
+        # Should reject invalid service area types with 400 or 500 error
+        if response.status_code in [400, 500]:
+            response_text = response.text
+            if "service_area_type" in response_text.lower() or "check constraint" in response_text.lower():
+                results.add_result("Service Area Validation (Invalid Type)", True, "Correctly rejects invalid service area types")
+            else:
+                results.add_result("Service Area Validation (Invalid Type)", False, f"Error doesn't mention service area: {response_text}")
         else:
-            results.add_result("Service Area Validation (Invalid Type)", False, f"Unexpected response: {response.status_code}")
+            results.add_result("Service Area Validation (Invalid Type)", False, f"Expected error for invalid type, got {response.status_code}")
             
     except Exception as e:
         results.add_result("Service Area Validation", False, f"Error: {str(e)}")
