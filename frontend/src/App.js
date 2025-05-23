@@ -317,6 +317,32 @@ function App() {
       return {
         type: 'Feature',
         properties: {
+          weight: 1 // Each agent contributes equally to coverage
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [lng, lat]
+        }
+      };
+    });
+
+    return {
+      type: 'FeatureCollection',
+      features
+    };
+  };
+
+  // Create coverage area heatmap data
+  const createCoverageHeatmap = () => {
+    const features = filteredAgents.map((agent, index) => {
+      // Generate consistent coordinates for each agent
+      const agentHash = agent.id ? agent.id.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0) : index;
+      const lat = agent.latitude || (40.7128 + ((agentHash % 100) - 50) * 0.001);
+      const lng = agent.longitude || (-74.0060 + ((agentHash % 100) - 50) * 0.001);
+      
+      return {
+        type: 'Feature',
+        properties: {
           weight: 1
         },
         geometry: {
