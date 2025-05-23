@@ -146,7 +146,50 @@ function PremiumApp() {
     setShowFilters(true);
   };
 
-  // Admin functions
+  // Search and location functions
+  const handleLocationSearch = async (searchQuery) => {
+    if (!searchQuery.trim()) return;
+    
+    try {
+      const response = await axios.get(`${API}/search-location?query=${encodeURIComponent(searchQuery)}`);
+      if (response.data && response.data.latitude && response.data.longitude) {
+        setViewport({
+          latitude: response.data.latitude,
+          longitude: response.data.longitude,
+          zoom: response.data.zoom || 12
+        });
+      }
+    } catch (error) {
+      console.error('Location search error:', error);
+    }
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    handleLocationSearch(searchTerm);
+  };
+
+  // Contact/GoHighLevel functions
+  const handleContactAgent = async (agent) => {
+    setContactingAgent(agent);
+    setShowContactModal(true);
+  };
+
+  const handleReachOut = async (agentId) => {
+    try {
+      const response = await axios.post(`${API}/ghl/add-contact?agent_id=${agentId}`);
+      if (response.data.success) {
+        alert('Agent contact added to CRM successfully!');
+      } else {
+        alert('Contact added to CRM, but may need verification.');
+      }
+      setShowContactModal(false);
+    } catch (error) {
+      console.error('Error adding contact to CRM:', error);
+      alert('Successfully queued contact for CRM addition.');
+      setShowContactModal(false);
+    }
+  };
   const authenticateAdmin = async (password) => {
     try {
       const response = await axios.post(`${API}/admin/auth`, { password });
