@@ -703,7 +703,14 @@ function PremiumApp() {
                           <div className="flex-1">
                             <h3 className="text-sm font-bold text-slate-900 mb-1">{agent.full_name}</h3>
                             <p className="text-xs text-slate-600">{agent.brokerage}</p>
-                            <p className="text-xs text-slate-500 mt-1">Area: {agent.service_area}</p>
+                            <div className="flex items-center mt-1">
+                              <p className="text-xs text-slate-500">Area: {agent.service_area}</p>
+                              {getStateFromServiceArea(agent.service_area) && (
+                                <span className="ml-2 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                                  {getStateFromServiceArea(agent.service_area)}
+                                </span>
+                              )}
+                            </div>
                           </div>
                           {ratingDisplay && (
                             <div
