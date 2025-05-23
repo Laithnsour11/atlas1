@@ -91,7 +91,7 @@ function PremiumApp() {
   const fetchAgents = async () => {
     try {
       const response = await axios.get(`${API}/agents`);
-      setAgents(response.data.agents || []);
+      setAgents(response.data || []);
     } catch (error) {
       console.error('Error fetching agents:', error);
     }
