@@ -183,14 +183,22 @@ function App() {
 
   const handleSearchLocation = async (query) => {
     try {
-      const response = await axios.get(`${API}/search-location?query=${query}`);
-      setViewport({
-        latitude: response.data.latitude,
-        longitude: response.data.longitude,
-        zoom: response.data.zoom
-      });
+      const response = await axios.get(`${API}/search-location?query=${encodeURIComponent(query)}`);
+      if (response.data && response.data.latitude && response.data.longitude) {
+        setViewport({
+          latitude: response.data.latitude,
+          longitude: response.data.longitude,
+          zoom: response.data.zoom || 12
+        });
+      }
     } catch (error) {
       console.error('Error searching location:', error);
+      // Fallback to NYC if search fails
+      setViewport({
+        latitude: 40.7128,
+        longitude: -74.0060,
+        zoom: 10
+      });
     }
   };
 
