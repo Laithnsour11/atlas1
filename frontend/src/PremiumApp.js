@@ -627,16 +627,12 @@ function PremiumApp() {
                     {/* Agent Info */}
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center text-slate-600">
-                        <MapPin className="w-4 h-4 mr-2" />
-                        <span>{agent.service_area}</span>
+                        <Building2 className="w-4 h-4 mr-2" />
+                        <span>Area: {agent.service_area}</span>
                       </div>
                       <div className="flex items-center text-slate-600">
                         <Phone className="w-4 h-4 mr-2" />
                         <span>{agent.phone}</span>
-                      </div>
-                      <div className="flex items-center text-slate-600">
-                        <Building2 className="w-4 h-4 mr-2" />
-                        <span>Area: {agent.service_area}</span>
                       </div>
                     </div>
 
