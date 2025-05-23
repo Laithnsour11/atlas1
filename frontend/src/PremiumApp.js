@@ -158,10 +158,62 @@ function PremiumApp() {
           longitude: response.data.longitude,
           zoom: response.data.zoom || 12
         });
+        setShowSuggestions(false);
+        setSearchSuggestions([]);
       }
     } catch (error) {
       console.error('Location search error:', error);
     }
+  };
+
+  const getSearchSuggestions = async (query) => {
+    if (!query.trim() || query.length < 3) {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=5&types=place,locality,neighborhood,address`
+      );
+      
+      if (response.ok) {
+        const data = await response.json();
+        const suggestions = data.features.map(feature => ({
+          id: feature.id,
+          text: feature.place_name,
+          latitude: feature.center[1],
+          longitude: feature.center[0]
+        }));
+        setSearchSuggestions(suggestions);
+        setShowSuggestions(true);
+      }
+    } catch (error) {
+      console.error('Search suggestions error:', error);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    // Debounce search suggestions
+    clearTimeout(window.searchTimeout);
+    window.searchTimeout = setTimeout(() => {
+      getSearchSuggestions(value);
+    }, 300);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchTerm(suggestion.text);
+    setViewport({
+      latitude: suggestion.latitude,
+      longitude: suggestion.longitude,
+      zoom: 12
+    });
+    setShowSuggestions(false);
+    setSearchSuggestions([]);
   };
 
   const handleSearchSubmit = (e) => {
