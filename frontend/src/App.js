@@ -532,29 +532,41 @@ function App() {
                 >
                   <NavigationControl position="top-right" />
                   
-                  {/* Coverage Area Heatmap */}
-                  <Source id="coverage-heatmap" type="geojson" data={createCoverageHeatmap()}>
+                  {/* Coverage Area Visualization */}
+                  <Source id="coverage-areas" type="geojson" data={createCoverageHeatmap()}>
+                    {/* City/County filled areas */}
                     <Layer
-                      id="coverage-heat"
-                      type="heatmap"
-                      source="coverage-heatmap"
-                      maxzoom={15}
+                      id="coverage-fill"
+                      type="fill"
+                      source="coverage-areas"
+                      filter={['in', ['get', 'service_area_type'], ['literal', ['city', 'county']]]}
                       paint={{
-                        'heatmap-weight': ['get', 'weight'],
-                        'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 3],
-                        'heatmap-color': [
-                          'interpolate',
-                          ['linear'],
-                          ['heatmap-density'],
-                          0, 'rgba(33, 102, 172, 0)',
-                          0.2, 'rgba(103, 169, 207, 0.6)',
-                          0.4, 'rgba(209, 229, 240, 0.7)',
-                          0.6, 'rgba(253, 219, 199, 0.8)',
-                          0.8, 'rgba(239, 138, 98, 0.9)',
-                          1, 'rgba(178, 24, 43, 1)'
-                        ],
-                        'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 20, 15, 40],
-                        'heatmap-opacity': 0.6
+                        'fill-color': '#3B82F6', // Blue color
+                        'fill-opacity': 0.2
+                      }}
+                    />
+                    {/* State outlines only */}
+                    <Layer
+                      id="coverage-outline-state"
+                      type="line"
+                      source="coverage-areas"
+                      filter={['==', ['get', 'service_area_type'], 'state']}
+                      paint={{
+                        'line-color': '#3B82F6', // Blue color
+                        'line-width': 2,
+                        'line-opacity': 0.8
+                      }}
+                    />
+                    {/* City/County outlines */}
+                    <Layer
+                      id="coverage-outline"
+                      type="line"
+                      source="coverage-areas"
+                      filter={['in', ['get', 'service_area_type'], ['literal', ['city', 'county']]]}
+                      paint={{
+                        'line-color': '#1D4ED8', // Darker blue
+                        'line-width': 1,
+                        'line-opacity': 0.6
                       }}
                     />
                   </Source>
