@@ -1080,6 +1080,227 @@ function PremiumApp() {
           </div>
         </div>
       )}
+
+      {/* Add Agent Form Modal */}
+      {showAddForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-900">Add New Agent</h2>
+                <button
+                  onClick={() => setShowAddForm(false)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleAddAgent} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Basic Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">
+                      Basic Information
+                    </h3>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newAgent.full_name}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, full_name: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter agent's full name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Brokerage *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newAgent.brokerage}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, brokerage: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Enter brokerage name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={newAgent.phone}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, phone: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="(555) 123-4567"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={newAgent.email}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, email: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="agent@example.com"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Website *
+                      </label>
+                      <input
+                        type="url"
+                        required
+                        value={newAgent.website}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, website: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="https://agentwebsite.com"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Service Area & Additional Info */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">
+                      Service Area & Details
+                    </h3>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Service Area Type *
+                      </label>
+                      <select
+                        required
+                        value={newAgent.service_area_type}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, service_area_type: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="city">City</option>
+                        <option value="county">County</option>
+                        <option value="state">State</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Service Area *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newAgent.service_area}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, service_area: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="New York, NY"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Last Deal Address *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newAgent.address_last_deal}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, address_last_deal: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="123 Main St, City, State"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Submitted By *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={newAgent.submitted_by}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, submitted_by: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Your name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Notes
+                      </label>
+                      <textarea
+                        value={newAgent.notes}
+                        onChange={(e) => setNewAgent(prev => ({ ...prev, notes: e.target.value }))}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Additional notes about the agent"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tags Selection */}
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2 mb-4">
+                    Specialties (Select applicable tags)
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                    {predefinedTags.map((tag, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        onClick={() => handleTagSelect(tag)}
+                        className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${
+                          newAgent.tags.includes(tag)
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">
+                    Selected: {newAgent.tags.length} tags
+                  </p>
+                </div>
+
+                {/* Form Actions */}
+                <div className="flex justify-between items-center pt-6 border-t border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddForm(false)}
+                    className="px-6 py-2 text-slate-600 hover:text-slate-800 transition-colors border border-slate-300 rounded-lg hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
+                  >
+                    Add Agent
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
