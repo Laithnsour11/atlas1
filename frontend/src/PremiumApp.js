@@ -456,24 +456,32 @@ function PremiumApp() {
           <form onSubmit={handleSearchSubmit} className="flex flex-col lg:flex-row gap-6 items-center">
             {/* Search */}
             <div className="flex-1 w-full relative">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 z-10" />
-                <input
-                  type="text"
-                  placeholder="Search locations, agents, or brokerages..."
-                  className="w-full pl-12 pr-4 py-3 bg-white/80 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-slate-900 placeholder-slate-500"
-                  value={searchTerm}
-                  onChange={handleSearchInputChange}
-                  onFocus={() => {
-                    if (searchSuggestions.length > 0) {
-                      setShowSuggestions(true);
-                    }
-                  }}
-                  onBlur={() => {
-                    // Delay hiding suggestions to allow clicks
-                    setTimeout(() => setShowSuggestions(false), 150);
-                  }}
-                />
+              <div className="relative flex">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 z-10" />
+                  <input
+                    type="text"
+                    placeholder="Search locations, agents, or brokerages..."
+                    className="w-full pl-12 pr-4 py-3 bg-white/80 border border-slate-200 rounded-l-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-slate-900 placeholder-slate-500"
+                    value={searchTerm}
+                    onChange={handleSearchInputChange}
+                    onFocus={() => {
+                      if (searchSuggestions.length > 0) {
+                        setShowSuggestions(true);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Delay hiding suggestions to allow clicks
+                      setTimeout(() => setShowSuggestions(false), 150);
+                    }}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-r-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 border border-l-0 border-blue-600"
+                >
+                  <Navigation className="w-5 h-5" />
+                </button>
               </div>
               
               {/* Search Suggestions Dropdown */}
