@@ -477,88 +477,209 @@ function PremiumApp() {
           )}
         </div>
 
-        {/* Agent Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredAgents.map((agent) => {
-            const ratingDisplay = getRatingDisplay(agent.rating);
-            
-            return (
-              <div key={agent.id} className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                {/* Agent Header */}
-                <div className="p-6 pb-4">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-slate-900 mb-1">{agent.full_name}</h3>
-                      <p className="text-slate-600 font-medium">{agent.brokerage}</p>
+        {/* Main Content Area - Conditional rendering based on view mode */}
+        {viewMode === 'map' && (
+          /* Full Screen Map */
+          <div className="h-[70vh] bg-white/60 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+            <MapboxMap
+              {...viewport}
+              onMove={evt => setViewport(evt.viewState)}
+              style={{width: '100%', height: '100%'}}
+              mapStyle="mapbox://styles/mapbox/light-v11"
+              mapboxAccessToken={MAPBOX_TOKEN}
+            >
+              <NavigationControl position="top-right" />
+              
+              {/* Agent Markers */}
+              {filteredAgents.map((agent) => (
+                agent.latitude && agent.longitude && (
+                  <Marker
+                    key={agent.id}
+                    latitude={agent.latitude}
+                    longitude={agent.longitude}
+                    anchor="bottom"
+                  >
+                    <div 
+                      className="w-8 h-8 bg-blue-600 rounded-full border-2 border-white shadow-lg cursor-pointer hover:bg-blue-700 transition-colors flex items-center justify-center"
+                      onClick={() => setSelectedAgent(agent)}
+                    >
+                      <Building2 className="w-4 h-4 text-white" />
                     </div>
-                    {ratingDisplay && (
-                      <div className="flex items-center space-x-2">
-                        <div
-                          className="p-2 rounded-lg"
-                          style={{ backgroundColor: `${ratingDisplay.color}20`, color: ratingDisplay.color }}
-                          title={ratingDisplay.description}
-                        >
-                          {ratingDisplay.icon}
+                  </Marker>
+                )
+              ))}
+            </MapboxMap>
+          </div>
+        )}
+
+        {viewMode === 'both' && (
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Left: Agent List */}
+            <div className="space-y-4">
+              {/* Agent Grid */}
+              <div className="grid gap-4">
+                {filteredAgents.slice(0, 6).map((agent) => {
+                  const ratingDisplay = getRatingDisplay(agent.rating);
+                  
+                  return (
+                    <div key={agent.id} className="bg-white/60 backdrop-blur-lg rounded-xl shadow-lg border border-white/20 overflow-hidden hover:shadow-xl transition-all duration-300">
+                      {/* Compact Agent Card for Split View */}
+                      <div className="p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex-1">
+                            <h3 className="text-sm font-bold text-slate-900 mb-1">{agent.full_name}</h3>
+                            <p className="text-xs text-slate-600">{agent.brokerage}</p>
+                          </div>
+                          {ratingDisplay && (
+                            <div
+                              className="p-1 rounded"
+                              style={{ backgroundColor: `${ratingDisplay.color}20`, color: ratingDisplay.color }}
+                              title={ratingDisplay.description}
+                            >
+                              {ratingDisplay.icon}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex justify-between text-xs">
+                          <button
+                            onClick={() => setSelectedAgent(agent)}
+                            className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition-colors"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleContactAgent(agent)}
+                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                          >
+                            Contact
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right: Map */}
+            <div className="h-[70vh] bg-white/60 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+              <MapboxMap
+                {...viewport}
+                onMove={evt => setViewport(evt.viewState)}
+                style={{width: '100%', height: '100%'}}
+                mapStyle="mapbox://styles/mapbox/light-v11"
+                mapboxAccessToken={MAPBOX_TOKEN}
+              >
+                <NavigationControl position="top-right" />
+                
+                {/* Agent Markers */}
+                {filteredAgents.map((agent) => (
+                  agent.latitude && agent.longitude && (
+                    <Marker
+                      key={agent.id}
+                      latitude={agent.latitude}
+                      longitude={agent.longitude}
+                      anchor="bottom"
+                    >
+                      <div 
+                        className="w-6 h-6 bg-blue-600 rounded-full border-2 border-white shadow-lg cursor-pointer hover:bg-blue-700 transition-colors flex items-center justify-center"
+                        onClick={() => setSelectedAgent(agent)}
+                      >
+                        <Building2 className="w-3 h-3 text-white" />
+                      </div>
+                    </Marker>
+                  )
+                ))}
+              </MapboxMap>
+            </div>
+          </div>
+        )}
+
+        {viewMode === 'list' && (
+          /* Agent Grid */
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredAgents.map((agent) => {
+              const ratingDisplay = getRatingDisplay(agent.rating);
+              
+              return (
+                <div key={agent.id} className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                  {/* Agent Header */}
+                  <div className="p-6 pb-4">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-slate-900 mb-1">{agent.full_name}</h3>
+                        <p className="text-slate-600 font-medium">{agent.brokerage}</p>
+                      </div>
+                      {ratingDisplay && (
+                        <div className="flex items-center space-x-2">
+                          <div
+                            className="p-2 rounded-lg"
+                            style={{ backgroundColor: `${ratingDisplay.color}20`, color: ratingDisplay.color }}
+                            title={ratingDisplay.description}
+                          >
+                            {ratingDisplay.icon}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Agent Info */}
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center text-slate-600">
+                        <MapPin className="w-4 h-4 mr-2" />
+                        <span>{agent.service_area}</span>
+                      </div>
+                      <div className="flex items-center text-slate-600">
+                        <Phone className="w-4 h-4 mr-2" />
+                        <span>{agent.phone}</span>
+                      </div>
+                    </div>
+
+                    {/* Tags */}
+                    {agent.tags && agent.tags.length > 0 && (
+                      <div className="mt-4">
+                        <div className="flex flex-wrap gap-1">
+                          {agent.tags.slice(0, 3).map((tag, index) => (
+                            <span
+                              key={index}
+                              className="px-2 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-medium"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                          {agent.tags.length > 3 && (
+                            <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs">
+                              +{agent.tags.length - 3} more
+                            </span>
+                          )}
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Agent Info */}
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center text-slate-600">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      <span>{agent.service_area}</span>
-                    </div>
-                    <div className="flex items-center text-slate-600">
-                      <Phone className="w-4 h-4 mr-2" />
-                      <span>{agent.phone}</span>
+                  {/* Agent Actions */}
+                  <div className="px-6 pb-6">
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => setSelectedAgent(agent)}
+                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-all duration-200 text-sm font-medium"
+                      >
+                        View Profile
+                      </button>
+                      <button
+                        onClick={() => handleContactAgent(agent)}
+                        className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-sm font-medium"
+                      >
+                        Contact
+                      </button>
                     </div>
                   </div>
-
-                  {/* Tags */}
-                  {agent.tags && agent.tags.length > 0 && (
-                    <div className="mt-4">
-                      <div className="flex flex-wrap gap-1">
-                        {agent.tags.slice(0, 3).map((tag, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-slate-100 text-slate-700 rounded-md text-xs font-medium"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                        {agent.tags.length > 3 && (
-                          <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs">
-                            +{agent.tags.length - 3} more
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
                 </div>
-
-                {/* Agent Actions */}
-                <div className="px-6 pb-6">
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => setSelectedAgent(agent)}
-                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-all duration-200 text-sm font-medium"
-                    >
-                      View Profile
-                    </button>
-                    <button
-                      onClick={() => handleContactAgent(agent)}
-                      className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-sm font-medium"
-                    >
-                      Contact
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Empty State */}
         {filteredAgents.length === 0 && (
