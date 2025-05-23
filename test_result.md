@@ -384,14 +384,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Agent API with New Schema"
-    - "Predefined Tags System"
-    - "GoHighLevel CRM Integration"
-    - "Enhanced Agent Cards - Smaller Design"
-    - "My Agents View"
-    - "Fixed Map-Only View"
-  stuck_tasks: []
-  test_all: true
+    - "Premium UI/UX Transformation with New Rating System"
+  stuck_tasks:
+    - "Admin Tag Management System"
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
