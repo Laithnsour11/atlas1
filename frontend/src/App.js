@@ -17,7 +17,9 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
+  const [minRating, setMinRating] = useState(0);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState({ author_name: '', content: '', rating: 5 });
