@@ -304,6 +304,18 @@ frontend:
         agent: "main"
         comment: "Updated modal to show profile images, notes section, address of last deal, submitted by, and enhanced contact information"
 
+  - task: "Standard Filter UX with Apply/Reset Pattern"
+    implemented: true
+    working: "unknown"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "unknown"
+        agent: "main"
+        comment: "Redesigned filter system to use standard UX pattern: Filter button expands into filter form, users select options without immediate application, Apply button applies filters, Reset button clears all filters, Cancel closes without applying. Added temporary filter states and active filter display."
+
 metadata:
   created_by: "main_agent"
   version: "2.0"
