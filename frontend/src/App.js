@@ -306,7 +306,7 @@ function App() {
     };
   };
 
-  // Create coverage area heatmap data
+  // Create coverage area visualization (blue range rings/outlines)
   const createCoverageHeatmap = () => {
     const features = filteredAgents.map((agent, index) => {
       // Generate consistent coordinates for each agent
@@ -314,14 +314,43 @@ function App() {
       const lat = agent.latitude || (40.7128 + ((agentHash % 100) - 50) * 0.001);
       const lng = agent.longitude || (-74.0060 + ((agentHash % 100) - 50) * 0.001);
       
+      // Define coverage radius based on service area type
+      let radiusKm;
+      switch (agent.service_area_type) {
+        case 'city':
+          radiusKm = 10; // 10km radius for city
+          break;
+        case 'county':
+          radiusKm = 25; // 25km radius for county
+          break;
+        case 'state':
+          radiusKm = 100; // 100km radius for state (will be outline only)
+          break;
+        default:
+          radiusKm = 15;
+      }
+      
+      // Create circle polygon
+      const steps = 64;
+      const coordinates = [];
+      for (let i = 0; i < steps; i++) {
+        const angle = (i / steps) * 2 * Math.PI;
+        const dx = radiusKm * 0.009 * Math.cos(angle); // Approximate km to degrees
+        const dy = radiusKm * 0.009 * Math.sin(angle);
+        coordinates.push([lng + dx, lat + dy]);
+      }
+      coordinates.push(coordinates[0]); // Close the polygon
+      
       return {
         type: 'Feature',
         properties: {
-          weight: 1 // Each agent contributes equally to coverage
+          agent_id: agent.id,
+          service_area_type: agent.service_area_type,
+          agent_name: agent.full_name
         },
         geometry: {
-          type: 'Point',
-          coordinates: [lng, lat]
+          type: 'Polygon',
+          coordinates: [coordinates]
         }
       };
     });
