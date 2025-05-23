@@ -714,7 +714,7 @@ function App() {
 
                 {/* Filters Button */}
                 <button
-                  onClick={() => setShowFilters(!showFilters)}
+                  onClick={openFilters}
                   className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                     showFilters 
                       ? 'bg-indigo-600 text-white' 
