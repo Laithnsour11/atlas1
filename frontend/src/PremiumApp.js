@@ -27,6 +27,8 @@ function PremiumApp() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState({ author_name: '', content: '', rating: '' });
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [contactingAgent, setContactingAgent] = useState(null);
   const [currentUser, setCurrentUser] = useState('');
   const [showMyAgents, setShowMyAgents] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
