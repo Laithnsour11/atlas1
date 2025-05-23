@@ -430,11 +430,11 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className={`${viewMode === 'map' ? 'w-full' : 'max-w-7xl mx-auto'} px-4 sm:px-6 lg:px-8 py-6`}>
         <div className={`${viewMode === 'both' ? 'flex gap-6' : ''}`}>
           {/* List View */}
           {(viewMode === 'list' || viewMode === 'both') && (
-            <div className={`${viewMode === 'both' ? 'w-1/2' : 'w-full'}`}>
+            <div className={`${viewMode === 'both' ? 'w-1/2' : 'w-full max-w-7xl mx-auto'}`}>
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-slate-800">
                   {filteredAgents.length} Agents Found {showMyAgents ? '(My Submissions)' : ''}
@@ -463,7 +463,7 @@ function App() {
 
           {/* Map View */}
           {(viewMode === 'map' || viewMode === 'both') && (
-            <div className={`${viewMode === 'both' ? 'w-1/2' : 'w-full'} h-[calc(100vh-200px)]`}>
+            <div className={`${viewMode === 'both' ? 'w-1/2' : 'w-full'} ${viewMode === 'map' ? 'h-screen' : 'h-[calc(100vh-200px)]'}`}>
               <div className="h-full rounded-lg overflow-hidden shadow-md">
                 <Map
                   {...viewport}
@@ -471,23 +471,47 @@ function App() {
                   mapboxAccessToken={MAPBOX_TOKEN}
                   style={{width: '100%', height: '100%'}}
                   mapStyle="mapbox://styles/mapbox/streets-v12"
+                  preserveDrawingBuffer={true}
                 >
                   <NavigationControl position="top-right" />
                   
-                  {/* Heatmap Layer */}
-                  <Source id="agents" type="geojson" data={createHeatmapData()}>
-                    <Layer {...heatmapLayer} />
+                  {/* Coverage Area Heatmap */}
+                  <Source id="coverage-heatmap" type="geojson" data={createCoverageHeatmap()}>
+                    <Layer
+                      id="coverage-heat"
+                      type="heatmap"
+                      source="coverage-heatmap"
+                      maxzoom={15}
+                      paint={{
+                        'heatmap-weight': ['get', 'weight'],
+                        'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 3],
+                        'heatmap-color': [
+                          'interpolate',
+                          ['linear'],
+                          ['heatmap-density'],
+                          0, 'rgba(33, 102, 172, 0)',
+                          0.2, 'rgba(103, 169, 207, 0.6)',
+                          0.4, 'rgba(209, 229, 240, 0.7)',
+                          0.6, 'rgba(253, 219, 199, 0.8)',
+                          0.8, 'rgba(239, 138, 98, 0.9)',
+                          1, 'rgba(178, 24, 43, 1)'
+                        ],
+                        'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 20, 15, 40],
+                        'heatmap-opacity': 0.6
+                      }}
+                    />
                   </Source>
                   
-                  {/* Agent Markers */}
+                  {/* Agent Markers - Stable positioning */}
                   {filteredAgents.map((agent, index) => {
-                    // Use default NYC coordinates if agent doesn't have coordinates
-                    const lat = agent.latitude || (40.7128 + (Math.random() - 0.5) * 0.1);
-                    const lng = agent.longitude || (-74.0060 + (Math.random() - 0.5) * 0.1);
+                    // Generate consistent coordinates for each agent
+                    const agentHash = agent.id ? agent.id.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0) : index;
+                    const lat = agent.latitude || (40.7128 + ((agentHash % 100) - 50) * 0.001);
+                    const lng = agent.longitude || (-74.0060 + ((agentHash % 100) - 50) * 0.001);
                     
                     return (
                       <Marker
-                        key={agent.id || index}
+                        key={`marker-${agent.id || index}`}
                         latitude={lat}
                         longitude={lng}
                         onClick={(e) => {
@@ -496,8 +520,9 @@ function App() {
                         }}
                       >
                         <div 
-                          className="bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all duration-200 shadow-lg"
-                          title={agent.full_name}
+                          className="bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all duration-200 shadow-lg border-2 border-white"
+                          title={`${agent.full_name} - ${agent.brokerage}`}
+                          style={{ zIndex: 1000 }}
                         >
                           <MapPin className="w-4 h-4" />
                         </div>
