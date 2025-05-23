@@ -312,7 +312,7 @@ function PremiumApp() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search & Controls */}
         <div className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
-          <div className="flex flex-col lg:flex-row gap-6 items-center">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col lg:flex-row gap-6 items-center">
             {/* Search */}
             <div className="flex-1 w-full">
               <div className="relative">
@@ -330,6 +330,7 @@ function PremiumApp() {
             {/* View Controls */}
             <div className="flex items-center space-x-2 bg-slate-100/80 rounded-lg p-1">
               <button
+                type="button"
                 onClick={() => setViewMode('list')}
                 className={`px-4 py-2 rounded-md transition-all duration-200 ${
                   viewMode === 'list' 
@@ -340,6 +341,7 @@ function PremiumApp() {
                 <List className="w-4 h-4" />
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('both')}
                 className={`px-4 py-2 rounded-md transition-all duration-200 ${
                   viewMode === 'both' 
@@ -350,6 +352,7 @@ function PremiumApp() {
                 <Filter className="w-4 h-4" />
               </button>
               <button
+                type="button"
                 onClick={() => setViewMode('map')}
                 className={`px-4 py-2 rounded-md transition-all duration-200 ${
                   viewMode === 'map' 
@@ -363,6 +366,7 @@ function PremiumApp() {
 
             {/* Filter Button */}
             <button
+              type="button"
               onClick={openFilters}
               className="inline-flex items-center px-4 py-2 bg-white/80 border border-slate-200 rounded-lg hover:bg-white transition-all duration-200 text-slate-700"
             >
@@ -374,7 +378,7 @@ function PremiumApp() {
                 </span>
               )}
             </button>
-          </div>
+          </form>
 
           {/* Expandable Filters */}
           {showFilters && (
