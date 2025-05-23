@@ -578,7 +578,7 @@ function App() {
           {/* Floating Search Panel for Map Mode */}
           <div className="absolute top-4 left-4 right-4 z-20 bg-white rounded-lg shadow-lg p-4">
             <div className="flex flex-col gap-4">
-              {/* Search with Autocomplete and Button */}
+              {/* Search with Autocomplete and Buttons */}
               <div className="flex gap-2">
                 <div className="flex-1 relative search-container">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -632,6 +632,25 @@ function App() {
                   Search
                 </button>
 
+                {/* Filters Button */}
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
+                    showFilters 
+                      ? 'bg-indigo-600 text-white' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                  title="Filters"
+                >
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filters
+                  {(selectedTags.length > 0 || minRating > 0) && (
+                    <span className="ml-2 bg-blue-600 text-white text-xs rounded-full px-2 py-1">
+                      {selectedTags.length + (minRating > 0 ? 1 : 0)}
+                    </span>
+                  )}
+                </button>
+
                 {/* View Mode Toggle */}
                 <div className="flex border border-gray-300 rounded-lg overflow-hidden">
                   <button
@@ -658,26 +677,77 @@ function App() {
                 </div>
               </div>
 
-              {/* Tags Filter - Compact Version for Map Mode */}
-              <div className="flex flex-wrap gap-2">
-                <span className="text-sm font-medium text-gray-700 mr-2">Tags:</span>
-                {predefinedTags.slice(0, 6).map((tag, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleTagToggle(tag)}
-                    className={`px-2 py-1 text-xs rounded-full transition-colors ${
-                      selectedTags.includes(tag)
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-                {predefinedTags.length > 6 && (
-                  <span className="text-xs text-gray-500 py-1">+{predefinedTags.length - 6} more</span>
-                )}
-              </div>
+              {/* Expandable Filters Panel */}
+              {showFilters && (
+                <div className="border-t pt-4 space-y-4">
+                  {/* Rating Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Minimum Rating
+                    </label>
+                    <div className="flex gap-2">
+                      {[0, 1, 2, 3, 4, 5].map((rating) => (
+                        <button
+                          key={rating}
+                          onClick={() => setMinRating(rating)}
+                          className={`flex items-center px-3 py-2 rounded-lg border transition-colors ${
+                            minRating === rating
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {rating === 0 ? (
+                            <span>Any</span>
+                          ) : (
+                            <div className="flex items-center">
+                              <span className="mr-1">{rating}</span>
+                              <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                              <span className="ml-1">+</span>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tag Filters */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Filter by Tags
+                    </label>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+                      {predefinedTags.map((tag, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleTagToggle(tag)}
+                          className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${
+                            selectedTags.includes(tag)
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Clear Filters */}
+                  {(selectedTags.length > 0 || minRating > 0) && (
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => {
+                          setSelectedTags([]);
+                          setMinRating(0);
+                        }}
+                        className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                      >
+                        Clear All Filters
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
