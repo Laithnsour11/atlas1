@@ -208,6 +208,12 @@ function App() {
     }
   };
 
+  const handleCommitSearch = () => {
+    if (searchTerm.trim()) {
+      handleSearchLocation(searchTerm);
+    }
+  };
+
   const handleTagToggle = (tag) => {
     setSelectedTags(prev => 
       prev.includes(tag) 
