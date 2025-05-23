@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Map as MapboxMap, Marker, NavigationControl, Source, Layer } from 'react-map-gl';
-import { Search, MapPin, Phone, Mail, Globe, Star, MessageCircle, Plus, Filter, List, Users, Building2, X, Send, ExternalLink, UserPlus, Eye, Settings, Shield, Award, AlertTriangle, Ban, Info } from 'lucide-react';
+import { Search, MapPin, Phone, Mail, Globe, Star, MessageCircle, Plus, Filter, List, Users, Building2, X, Send, ExternalLink, UserPlus, Eye, Settings, Shield, Award, AlertTriangle, Ban, Info, User, Navigation } from 'lucide-react';
 import './App.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
