@@ -15,6 +15,8 @@ function App() {
   const [predefinedTags, setPredefinedTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [comments, setComments] = useState([]);
