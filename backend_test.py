@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Testing for Atlas Real Estate Directory
-Tests all API endpoints and database operations
+Comprehensive Backend API Testing for Enhanced Atlas Real Estate Directory
+Tests all new API endpoints and enhanced features including:
+- Enhanced Agent API with New Schema
+- Predefined Tags System
+- GoHighLevel CRM Integration
+- Image Scraping Functionality
+- Location Search API
+- Service Area Type Validation
 """
 
 import requests
@@ -29,8 +35,8 @@ if not BACKEND_URL:
 
 API_BASE = f"{BACKEND_URL}/api"
 
-print(f"Testing Atlas Backend API at: {API_BASE}")
-print("=" * 60)
+print(f"Testing Enhanced Atlas Backend API at: {API_BASE}")
+print("=" * 80)
 
 class TestResults:
     def __init__(self):
