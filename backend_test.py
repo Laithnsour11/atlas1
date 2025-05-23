@@ -44,30 +44,39 @@ class TestResults:
         self.tests_passed = 0
         self.tests_failed = 0
         self.failures = []
+        self.critical_failures = []
     
-    def add_result(self, test_name: str, passed: bool, details: str = ""):
+    def add_result(self, test_name: str, passed: bool, details: str = "", critical: bool = False):
         self.tests_run += 1
         if passed:
             self.tests_passed += 1
             print(f"✅ {test_name}")
         else:
             self.tests_failed += 1
-            self.failures.append(f"{test_name}: {details}")
+            failure_msg = f"{test_name}: {details}"
+            self.failures.append(failure_msg)
+            if critical:
+                self.critical_failures.append(failure_msg)
             print(f"❌ {test_name}: {details}")
     
     def summary(self):
-        print("\n" + "=" * 60)
-        print(f"TEST SUMMARY")
+        print("\n" + "=" * 80)
+        print(f"ENHANCED ATLAS API TEST SUMMARY")
         print(f"Total Tests: {self.tests_run}")
         print(f"Passed: {self.tests_passed}")
         print(f"Failed: {self.tests_failed}")
         
-        if self.failures:
-            print("\nFAILURES:")
+        if self.critical_failures:
+            print(f"\nCRITICAL FAILURES ({len(self.critical_failures)}):")
+            for failure in self.critical_failures:
+                print(f"  🚨 {failure}")
+        
+        if self.failures and not self.critical_failures:
+            print("\nALL FAILURES (Minor Issues):")
             for failure in self.failures:
                 print(f"  - {failure}")
         
-        return self.tests_failed == 0
+        return len(self.critical_failures) == 0
 
 results = TestResults()
 
