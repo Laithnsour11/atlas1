@@ -564,102 +564,167 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <div className={`${viewMode === 'map' ? 'w-full' : 'max-w-7xl mx-auto'} px-4 sm:px-6 lg:px-8 py-6`}>
-        <div className={`${viewMode === 'both' ? 'flex gap-6' : ''}`}>
-          {/* List View */}
-          {(viewMode === 'list' || viewMode === 'both') && (
-            <div className={`${viewMode === 'both' ? 'w-1/2' : 'w-full max-w-7xl mx-auto'}`}>
-              <div className="mb-4">
-                <h2 className="text-lg font-semibold text-slate-800">
-                  {filteredAgents.length} Agents Found {showMyAgents ? '(My Submissions)' : ''}
-                </h2>
-              </div>
+      {viewMode === 'map' ? (
+        // Full screen map mode
+        <div className="fixed inset-0 top-16 z-10">
+          <div className="h-full w-full">
+            <MapboxMap
+              {...viewport}
+              onMove={evt => setViewport(evt.viewState)}
+              mapboxAccessToken={MAPBOX_TOKEN}
+              style={{width: '100%', height: '100%'}}
+              mapStyle="mapbox://styles/mapbox/streets-v12"
+              preserveDrawingBuffer={true}
+            >
+              <NavigationControl position="top-right" />
               
-              <div className="space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto">
-                {loading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-2 text-slate-600">Loading agents...</p>
-                  </div>
-                ) : filteredAgents.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-slate-600">No agents found in current view.</p>
-                  </div>
-                ) : (
-                  filteredAgents.map((agent) => (
-                    <AgentCard key={agent.id} agent={agent} />
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Map View */}
-          {(viewMode === 'map' || viewMode === 'both') && (
-            <div className={`${viewMode === 'both' ? 'w-1/2' : 'w-full'} ${viewMode === 'map' ? 'h-screen' : 'h-[calc(100vh-200px)]'}`}>
-              <div className="h-full rounded-lg overflow-hidden shadow-md">
-                <MapboxMap
-                  {...viewport}
-                  onMove={evt => setViewport(evt.viewState)}
-                  mapboxAccessToken={MAPBOX_TOKEN}
-                  style={{width: '100%', height: '100%'}}
-                  mapStyle="mapbox://styles/mapbox/streets-v12"
-                  preserveDrawingBuffer={true}
-                >
-                  <NavigationControl position="top-right" />
-                  
-                  {/* Coverage Area Visualization */}
-                  <Source id="coverage-areas" type="geojson" data={createCoverageHeatmap()}>
-                    <Layer
-                      id="coverage-fill"
-                      type="fill"
-                      source="coverage-areas"
-                      paint={{
-                        'fill-color': [
-                          'case',
-                          ['==', ['get', 'service_area_type'], 'city'], '#3B82F6',
-                          ['==', ['get', 'service_area_type'], 'county'], '#6366F1',
-                          ['==', ['get', 'service_area_type'], 'state'], '#8B5CF6',
-                          '#3B82F6'
-                        ],
-                        'fill-opacity': 0.15
-                      }}
-                    />
-                  </Source>
-                  
-                  {/* Agent Markers */}
-                  {filteredAgents.map((agent, index) => {
-                    const agentHash = agent.id ? agent.id.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0) : index;
-                    const lat = agent.latitude || (40.7128 + ((agentHash % 100) - 50) * 0.001);
-                    const lng = agent.longitude || (-74.0060 + ((agentHash % 100) - 50) * 0.001);
-                    
-                    return (
-                      <Marker
-                        key={`marker-${agent.id || index}`}
-                        latitude={lat}
-                        longitude={lng}
-                        onClick={(e) => {
-                          e.originalEvent.stopPropagation();
-                          handleAgentClick(agent);
-                        }}
-                      >
-                        <div 
-                          className="bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all duration-200 shadow-lg border-2 border-white"
-                          title={`${agent.full_name} - ${agent.brokerage}`}
-                          style={{ zIndex: 1000 }}
-                        >
-                          <MapPin className="w-4 h-4" />
-                        </div>
-                      </Marker>
-                    );
-                  })}
-                </MapboxMap>
-              </div>
-            </div>
-          )}
+              {/* Coverage Area Visualization */}
+              <Source id="coverage-areas" type="geojson" data={createCoverageHeatmap()}>
+                <Layer
+                  id="coverage-fill"
+                  type="fill"
+                  source="coverage-areas"
+                  paint={{
+                    'fill-color': [
+                      'case',
+                      ['==', ['get', 'service_area_type'], 'city'], '#3B82F6',
+                      ['==', ['get', 'service_area_type'], 'county'], '#6366F1',
+                      ['==', ['get', 'service_area_type'], 'state'], '#8B5CF6',
+                      '#3B82F6'
+                    ],
+                    'fill-opacity': 0.15
+                  }}
+                />
+              </Source>
+              
+              {/* Agent Markers */}
+              {filteredAgents.map((agent, index) => {
+                const agentHash = agent.id ? agent.id.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0) : index;
+                const lat = agent.latitude || (40.7128 + ((agentHash % 100) - 50) * 0.001);
+                const lng = agent.longitude || (-74.0060 + ((agentHash % 100) - 50) * 0.001);
+                
+                return (
+                  <Marker
+                    key={`marker-${agent.id || index}`}
+                    latitude={lat}
+                    longitude={lng}
+                    onClick={(e) => {
+                      e.originalEvent.stopPropagation();
+                      handleAgentClick(agent);
+                    }}
+                  >
+                    <div 
+                      className="bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all duration-200 shadow-lg border-2 border-white"
+                      title={`${agent.full_name} - ${agent.brokerage}`}
+                      style={{ zIndex: 1000 }}
+                    >
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                  </Marker>
+                );
+              })}
+            </MapboxMap>
+          </div>
         </div>
-      </div>
+      ) : (
+        // List and both modes
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className={`${viewMode === 'both' ? 'flex gap-6' : ''}`}>
+            {/* List View */}
+            {(viewMode === 'list' || viewMode === 'both') && (
+              <div className={`${viewMode === 'both' ? 'w-1/2' : 'w-full'}`}>
+                <div className="mb-4">
+                  <h2 className="text-lg font-semibold text-slate-800">
+                    {filteredAgents.length} Agents Found {showMyAgents ? '(My Submissions)' : ''}
+                  </h2>
+                </div>
+                
+                <div className="space-y-2 max-h-[calc(100vh-300px)] overflow-y-auto">
+                  {loading ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                      <p className="mt-2 text-slate-600">Loading agents...</p>
+                    </div>
+                  ) : filteredAgents.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-slate-600">No agents found in current view.</p>
+                    </div>
+                  ) : (
+                    filteredAgents.map((agent) => (
+                      <AgentCard key={agent.id} agent={agent} />
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Map View for both mode */}
+            {viewMode === 'both' && (
+              <div className="w-1/2 h-[calc(100vh-200px)]">
+                <div className="h-full rounded-lg overflow-hidden shadow-md">
+                  <MapboxMap
+                    {...viewport}
+                    onMove={evt => setViewport(evt.viewState)}
+                    mapboxAccessToken={MAPBOX_TOKEN}
+                    style={{width: '100%', height: '100%'}}
+                    mapStyle="mapbox://styles/mapbox/streets-v12"
+                    preserveDrawingBuffer={true}
+                  >
+                    <NavigationControl position="top-right" />
+                    
+                    {/* Coverage Area Visualization */}
+                    <Source id="coverage-areas" type="geojson" data={createCoverageHeatmap()}>
+                      <Layer
+                        id="coverage-fill"
+                        type="fill"
+                        source="coverage-areas"
+                        paint={{
+                          'fill-color': [
+                            'case',
+                            ['==', ['get', 'service_area_type'], 'city'], '#3B82F6',
+                            ['==', ['get', 'service_area_type'], 'county'], '#6366F1',
+                            ['==', ['get', 'service_area_type'], 'state'], '#8B5CF6',
+                            '#3B82F6'
+                          ],
+                          'fill-opacity': 0.15
+                        }}
+                      />
+                    </Source>
+                    
+                    {/* Agent Markers */}
+                    {filteredAgents.map((agent, index) => {
+                      const agentHash = agent.id ? agent.id.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0) : index;
+                      const lat = agent.latitude || (40.7128 + ((agentHash % 100) - 50) * 0.001);
+                      const lng = agent.longitude || (-74.0060 + ((agentHash % 100) - 50) * 0.001);
+                      
+                      return (
+                        <Marker
+                          key={`marker-${agent.id || index}`}
+                          latitude={lat}
+                          longitude={lng}
+                          onClick={(e) => {
+                            e.originalEvent.stopPropagation();
+                            handleAgentClick(agent);
+                          }}
+                        >
+                          <div 
+                            className="bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all duration-200 shadow-lg border-2 border-white"
+                            title={`${agent.full_name} - ${agent.brokerage}`}
+                            style={{ zIndex: 1000 }}
+                          >
+                            <MapPin className="w-4 h-4" />
+                          </div>
+                        </Marker>
+                      );
+                    })}
+                  </MapboxMap>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Agent Details Modal */}
       {selectedAgent && (
