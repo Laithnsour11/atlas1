@@ -37,7 +37,7 @@ app = FastAPI(title="Atlas API", description="Real Estate Agent Directory")
 api_router = APIRouter(prefix="/api")
 
 # Default tags (can be customized via admin settings)
-PREDEFINED_TAGS = [
+DEFAULT_TAGS = [
     "Residential Sales", "Commercial Sales", "Luxury Properties", "Investment Properties",
     "First-Time Buyers", "Military Relocation", "Senior Living", "New Construction",
     "Foreclosures", "Short Sales", "Property Management", "Land Sales",
@@ -241,7 +241,7 @@ async def health_check():
 @api_router.get("/tags")
 async def get_predefined_tags():
     """Get list of predefined tags for agents"""
-    return {"tags": PREDEFINED_TAGS}
+    return {"tags": DEFAULT_TAGS}
 
 @api_router.get("/service-area-types")
 async def get_service_area_types():
