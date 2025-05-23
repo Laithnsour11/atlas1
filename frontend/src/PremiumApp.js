@@ -747,6 +747,206 @@ function PremiumApp() {
           </div>
         </div>
       )}
+
+      {/* Contact Modal */}
+      {showContactModal && contactingAgent && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-slate-900">Contact Agent</h2>
+                <button
+                  onClick={() => setShowContactModal(false)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Agent Summary */}
+              <div className="bg-slate-50 rounded-lg p-4 mb-6">
+                <h3 className="font-bold text-slate-900">{contactingAgent.full_name}</h3>
+                <p className="text-slate-600">{contactingAgent.brokerage}</p>
+                <div className="mt-2 space-y-1 text-sm text-slate-600">
+                  <div className="flex items-center">
+                    <Phone className="w-4 h-4 mr-2" />
+                    <span>{contactingAgent.phone}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Mail className="w-4 h-4 mr-2" />
+                    <span>{contactingAgent.email}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Globe className="w-4 h-4 mr-2" />
+                    <span>{contactingAgent.website}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Options */}
+              <div className="space-y-3">
+                <a
+                  href={`tel:${contactingAgent.phone}`}
+                  className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <Phone className="w-5 h-5 mr-2" />
+                  Call Now
+                </a>
+                
+                <a
+                  href={`mailto:${contactingAgent.email}`}
+                  className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Mail className="w-5 h-5 mr-2" />
+                  Send Email
+                </a>
+                
+                <a
+                  href={contactingAgent.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center px-4 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
+                >
+                  <Globe className="w-5 h-5 mr-2" />
+                  Visit Website
+                </a>
+
+                <button
+                  onClick={() => handleReachOut(contactingAgent.id)}
+                  className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+                >
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  Add to CRM
+                </button>
+              </div>
+
+              <div className="mt-4 text-xs text-slate-500 text-center">
+                "Add to CRM" will automatically add this agent to your GoHighLevel contact list
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Agent Profile Modal */}
+      {selectedAgent && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-900">Agent Profile</h2>
+                <button
+                  onClick={() => setSelectedAgent(null)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Agent Details */}
+              <div className="space-y-6">
+                <div className="bg-slate-50 rounded-lg p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-900">{selectedAgent.full_name}</h3>
+                      <p className="text-slate-600 font-medium">{selectedAgent.brokerage}</p>
+                      {selectedAgent.rating && (
+                        <div className="mt-2">
+                          {(() => {
+                            const display = getRatingDisplay(selectedAgent.rating);
+                            return display ? (
+                              <div className="flex items-center space-x-2">
+                                <div
+                                  className="p-2 rounded-lg"
+                                  style={{ backgroundColor: `${display.color}20`, color: display.color }}
+                                >
+                                  {display.icon}
+                                </div>
+                                <div>
+                                  <div className="font-medium" style={{ color: display.color }}>
+                                    {display.label}
+                                  </div>
+                                  <div className="text-xs text-slate-500">{display.description}</div>
+                                </div>
+                              </div>
+                            ) : null;
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-3">
+                      <div className="flex items-center text-slate-600">
+                        <Phone className="w-4 h-4 mr-3" />
+                        <span>{selectedAgent.phone}</span>
+                      </div>
+                      <div className="flex items-center text-slate-600">
+                        <Mail className="w-4 h-4 mr-3" />
+                        <span>{selectedAgent.email}</span>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center text-slate-600">
+                        <Globe className="w-4 h-4 mr-3" />
+                        <a href={selectedAgent.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                          View Website
+                        </a>
+                      </div>
+                      <div className="flex items-center text-slate-600">
+                        <MapPin className="w-4 h-4 mr-3" />
+                        <span>{selectedAgent.service_area} ({selectedAgent.service_area_type})</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tags */}
+                {selectedAgent.tags && selectedAgent.tags.length > 0 && (
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-3">Specialties</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedAgent.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Notes */}
+                {selectedAgent.notes && (
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-3">Notes</h4>
+                    <p className="text-slate-600 bg-slate-50 rounded-lg p-4">{selectedAgent.notes}</p>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    onClick={() => handleContactAgent(selectedAgent)}
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
+                  >
+                    Contact Agent
+                  </button>
+                  <button
+                    onClick={() => handleReachOut(selectedAgent.id)}
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+                  >
+                    Add to CRM
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
