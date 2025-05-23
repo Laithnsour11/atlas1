@@ -425,21 +425,29 @@ function App() {
       <div className="bg-white border-b border-gray-200 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search by name, brokerage, or area..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  if (e.target.value) {
-                    handleSearchLocation(e.target.value);
-                  }
-                }}
-              />
+            {/* Search with Button */}
+            <div className="flex-1 flex gap-2">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search address, city, or state..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleCommitSearch();
+                    }
+                  }}
+                />
+              </div>
+              <button
+                onClick={handleCommitSearch}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Search
+              </button>
             </div>
 
             {/* View Mode Toggle */}
@@ -467,6 +475,7 @@ function App() {
 
           {/* Tags Filter */}
           <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Tags:</label>
             <div className="flex flex-wrap gap-2">
               {predefinedTags.slice(0, 10).map((tag, index) => (
                 <button
