@@ -273,14 +273,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Supabase Database Integration"
-    - "Professionals API Endpoints"
-    - "Search and Filter Interface"
-    - "Mapbox Integration and Map View"
-  stuck_tasks: []
-  test_all: true
+    - "Geo-location Search"
+  stuck_tasks:
+    - "Geo-location Search"
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
     message: "Completed initial Atlas implementation with Supabase backend, Mapbox frontend, and all core features. Database tables need to be created in Supabase dashboard (SQL provided to user). Ready for comprehensive backend testing to verify API endpoints and database connections."
+  - agent: "testing"
+    message: "Comprehensive backend testing completed. Core functionality working excellently with 4/5 major backend tasks passing. Supabase integration is solid, all CRUD operations working, search and filtering functional. One routing issue identified in geo-location search that needs route reordering fix."
