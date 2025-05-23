@@ -259,6 +259,7 @@ function PremiumApp() {
   const handleContactAgent = async (agent) => {
     setContactingAgent(agent);
     setShowContactModal(true);
+    setSelectedAgent(null); // Close profile modal if open
   };
 
   const handleReachOut = async (agentId) => {
@@ -274,6 +275,43 @@ function PremiumApp() {
       console.error('Error adding contact to CRM:', error);
       alert('Successfully queued contact for CRM addition.');
       setShowContactModal(false);
+    }
+  };
+
+  // Comments functions
+  const fetchComments = async (agentId) => {
+    try {
+      const response = await axios.get(`${API}/agents/${agentId}/comments`);
+      setComments(response.data || []);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      setComments([]);
+    }
+  };
+
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.author_name.trim() || !newComment.content.trim()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${API}/comments`, {
+        agent_id: contactingAgent.id,
+        author_name: newComment.author_name,
+        content: newComment.content,
+        rating: newComment.rating || null
+      });
+      
+      if (response.data) {
+        await fetchComments(contactingAgent.id); // Refresh comments
+        setNewComment({ author_name: '', content: '', rating: '' });
+        alert('Comment added successfully!');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert('Error adding comment. Please try again.');
     }
   };
 
