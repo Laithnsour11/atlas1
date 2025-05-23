@@ -64,6 +64,8 @@ def setup_database():
             submitted_by TEXT NOT NULL,
             notes TEXT,
             profile_image TEXT,
+            latitude FLOAT,
+            longitude FLOAT,
             rating FLOAT DEFAULT 0,
             created_at TIMESTAMPTZ DEFAULT NOW()
         );
