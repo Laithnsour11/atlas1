@@ -606,6 +606,7 @@ function PremiumApp() {
                           <div className="flex-1">
                             <h3 className="text-sm font-bold text-slate-900 mb-1">{agent.full_name}</h3>
                             <p className="text-xs text-slate-600">{agent.brokerage}</p>
+                            <p className="text-xs text-slate-500 mt-1">Area: {agent.service_area}</p>
                           </div>
                           {ratingDisplay && (
                             <div
