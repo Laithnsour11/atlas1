@@ -567,6 +567,9 @@ logger = logging.getLogger(__name__)
 @app.on_event("startup")
 async def startup_event():
     await init_database()
+    logger.info("Starting Atlas API server...")
+    # Initialize tag settings table
+    create_tag_settings_table()
     logger.info("Atlas API started successfully")
 
 @app.on_event("shutdown")
