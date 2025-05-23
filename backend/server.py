@@ -250,8 +250,93 @@ async def health_check():
 
 @api_router.get("/tags")
 async def get_predefined_tags():
-    """Get list of predefined tags for agents"""
-    return {"tags": DEFAULT_TAGS}
+    """Get list of customizable tags for agents"""
+    try:
+        # Try to get custom tags from database first
+        result = supabase.table('tag_settings').select("tags").limit(1).execute()
+        if result.data and result.data[0].get('tags'):
+            return {"tags": result.data[0]['tags']}
+        else:
+            # Return default tags if no custom tags exist
+            return {"tags": DEFAULT_TAGS}
+    except Exception as e:
+        # Fallback to default tags if database error
+        return {"tags": DEFAULT_TAGS}
+
+@api_router.get("/rating-levels")
+async def get_rating_levels():
+    """Get available rating levels with descriptions"""
+    return {"ratings": RATING_LEVELS}
+
+# Admin authentication endpoint
+@api_router.post("/admin/auth")
+async def authenticate_admin(auth: AdminAuth):
+    """Authenticate admin access"""
+    if auth.password == ADMIN_PASSWORD:
+        return {"authenticated": True, "message": "Access granted"}
+    else:
+        raise HTTPException(status_code=401, detail="Invalid password")
+
+# Admin settings endpoints
+@api_router.get("/admin/tags")
+async def get_admin_tags(password: str = Query(..., description="Admin password")):
+    """Get tags for admin management"""
+    if password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Invalid password")
+    
+    try:
+        # Get custom tags from database
+        result = supabase.table('tag_settings').select("tags").limit(1).execute()
+        if result.data and result.data[0].get('tags'):
+            return {"tags": result.data[0]['tags']}
+        else:
+            return {"tags": DEFAULT_TAGS}
+    except Exception as e:
+        return {"tags": DEFAULT_TAGS}
+
+@api_router.post("/admin/tags")
+async def update_admin_tags(tag_settings: TagSettings, password: str = Query(..., description="Admin password")):
+    """Update customizable tags (admin only)"""
+    if password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Invalid password")
+    
+    try:
+        # Validate tags (non-empty, reasonable length)
+        if not tag_settings.tags or len(tag_settings.tags) == 0:
+            raise HTTPException(status_code=400, detail="At least one tag is required")
+        
+        for tag in tag_settings.tags:
+            if not tag.strip() or len(tag.strip()) < 2:
+                raise HTTPException(status_code=400, detail="Tags must be at least 2 characters long")
+        
+        # Update or insert tag settings
+        result = supabase.table('tag_settings').upsert({"id": 1, "tags": tag_settings.tags}).execute()
+        return {"message": "Tags updated successfully", "tags": tag_settings.tags}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.delete("/admin/tags/{tag_name}")
+async def delete_admin_tag(tag_name: str, password: str = Query(..., description="Admin password")):
+    """Delete a specific tag (admin only)"""
+    if password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Invalid password")
+    
+    try:
+        # Get current tags
+        result = supabase.table('tag_settings').select("tags").limit(1).execute()
+        current_tags = result.data[0]['tags'] if result.data and result.data[0].get('tags') else DEFAULT_TAGS
+        
+        # Remove the tag
+        updated_tags = [tag for tag in current_tags if tag != tag_name]
+        
+        if len(updated_tags) == len(current_tags):
+            raise HTTPException(status_code=404, detail="Tag not found")
+        
+        # Update database
+        supabase.table('tag_settings').upsert({"id": 1, "tags": updated_tags}).execute()
+        return {"message": f"Tag '{tag_name}' deleted successfully", "tags": updated_tags}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/service-area-types")
 async def get_service_area_types():
