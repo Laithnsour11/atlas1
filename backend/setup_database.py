@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Database setup script for Atlas - Creates Supabase tables
+Database setup script for Atlas - Creates Supabase tables for agents
 """
 
 import os
@@ -40,58 +40,51 @@ def setup_database():
         # Test connection
         print("Testing Supabase connection...")
         
-        # Create tables using Supabase SQL editor or migrations
-        # For now, let's create some sample data to test the connection
-        
         print("Database setup completed successfully!")
         print("Please create the following tables in your Supabase dashboard:")
         print("""
         
-        -- Create professionals table
-        CREATE TABLE professionals (
+        -- Drop old tables if they exist
+        DROP TABLE IF EXISTS comments CASCADE;
+        DROP TABLE IF EXISTS professionals CASCADE;
+        DROP TABLE IF EXISTS suggestions CASCADE;
+
+        -- Create agents table (replacing professionals)
+        CREATE TABLE agents (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            name TEXT NOT NULL,
-            type TEXT NOT NULL CHECK (type IN ('agent', 'buyer', 'vendor')),
-            company TEXT,
-            phone TEXT,
-            email TEXT,
-            website TEXT,
-            service_areas TEXT[],
-            specialties TEXT[],
-            latitude FLOAT,
-            longitude FLOAT,
+            full_name TEXT NOT NULL,
+            brokerage TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            email TEXT NOT NULL,
+            website TEXT NOT NULL,
+            service_area_type TEXT NOT NULL CHECK (service_area_type IN ('city', 'county', 'state')),
+            service_area TEXT NOT NULL,
+            tags TEXT[] NOT NULL DEFAULT '{}',
+            address_last_deal TEXT NOT NULL,
+            submitted_by TEXT NOT NULL,
+            notes TEXT,
+            profile_image TEXT,
             rating FLOAT DEFAULT 0,
             created_at TIMESTAMPTZ DEFAULT NOW()
         );
 
-        -- Create comments table
+        -- Create comments table (updated for agents)
         CREATE TABLE comments (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            professional_id UUID REFERENCES professionals(id) ON DELETE CASCADE,
+            agent_id UUID REFERENCES agents(id) ON DELETE CASCADE,
             author_name TEXT NOT NULL,
             content TEXT NOT NULL,
             rating INTEGER CHECK (rating >= 1 AND rating <= 5),
             created_at TIMESTAMPTZ DEFAULT NOW()
         );
 
-        -- Create suggestions table
-        CREATE TABLE suggestions (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            professional_id UUID,
-            suggestion_type TEXT NOT NULL,
-            content TEXT NOT NULL,
-            submitter_name TEXT,
-            submitter_email TEXT,
-            status TEXT DEFAULT 'pending',
-            created_at TIMESTAMPTZ DEFAULT NOW()
-        );
-
-        -- Create some sample data
-        INSERT INTO professionals (name, type, company, phone, email, service_areas, specialties, latitude, longitude, rating) VALUES
-        ('Sarah Johnson', 'agent', 'Century 21', '(555) 123-4567', 'sarah@century21.com', ARRAY['Manhattan', 'Brooklyn'], ARRAY['residential', 'luxury'], 40.7589, -73.9851, 4.8),
-        ('Mike Chen', 'agent', 'Coldwell Banker', '(555) 234-5678', 'mike@coldwell.com', ARRAY['Queens', 'Bronx'], ARRAY['commercial', 'investment'], 40.7282, -73.7949, 4.6),
-        ('Lisa Rodriguez', 'buyer', 'Independent', '(555) 345-6789', 'lisa@email.com', ARRAY['Staten Island'], ARRAY['residential'], 40.5795, -74.1502, 4.9),
-        ('David Kim', 'vendor', 'Kim Construction', '(555) 456-7890', 'david@kimconstruction.com', ARRAY['Manhattan', 'Queens'], ARRAY['renovation', 'inspection'], 40.7505, -73.9934, 4.7);
+        -- Create some sample agents data
+        INSERT INTO agents (full_name, brokerage, phone, email, website, service_area_type, service_area, tags, address_last_deal, submitted_by, notes, rating) VALUES
+        ('Sarah Johnson', 'Century 21', '(555) 123-4567', 'sarah@century21.com', 'https://century21.com/sarah', 'city', 'Manhattan', ARRAY['Residential Sales', 'Luxury Properties', 'First-Time Buyers'], '123 Park Ave, New York, NY 10017', 'Admin', 'Top performer with excellent client reviews', 4.8),
+        ('Mike Chen', 'Coldwell Banker', '(555) 234-5678', 'mike@coldwell.com', 'https://coldwellbanker.com/mike', 'county', 'Kings County', ARRAY['Commercial Sales', 'Investment Properties'], '456 Broadway, Brooklyn, NY 11201', 'Admin', 'Specializes in commercial real estate', 4.6),
+        ('Lisa Rodriguez', 'Compass', '(555) 345-6789', 'lisa@compass.com', 'https://compass.com/lisa', 'city', 'Queens', ARRAY['Residential Sales', 'New Construction'], '789 Main St, Queens, NY 11354', 'Admin', 'Expert in new construction properties', 4.9),
+        ('David Kim', 'Keller Williams', '(555) 456-7890', 'david@kw.com', 'https://kw.com/david', 'city', 'Bronx', ARRAY['Buyer Representation', 'Military Relocation'], '321 Grand Ave, Bronx, NY 10451', 'Admin', 'Military relocation specialist', 4.7),
+        ('Emily Parker', 'Douglas Elliman', '(555) 567-8901', 'emily@elliman.com', 'https://elliman.com/emily', 'city', 'Manhattan', ARRAY['Luxury Properties', 'Seller Representation'], '567 Fifth Ave, New York, NY 10036', 'Admin', 'Luxury market expert on Upper East Side', 4.9);
         """)
         
         return True
