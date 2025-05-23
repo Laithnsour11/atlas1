@@ -286,6 +286,8 @@ function PremiumApp() {
       }));
     }
   };
+
+  // Admin functions
   const authenticateAdmin = async (password) => {
     try {
       const response = await axios.post(`${API}/admin/auth`, { password });
