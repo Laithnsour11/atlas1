@@ -1415,12 +1415,6 @@ function PremiumApp() {
                   >
                     Contact Agent
                   </button>
-                  <button
-                    onClick={() => handleReachOut(selectedAgent.id)}
-                    className="flex-1 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
-                  >
-                    Add to CRM
-                  </button>
                 </div>
               </div>
             </div>
