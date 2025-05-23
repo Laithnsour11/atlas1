@@ -58,6 +58,11 @@ function App() {
         a.brokerage?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         a.service_area?.toLowerCase().includes(searchTerm.toLowerCase())
       );
+      
+      // Auto-navigate map when searching
+      if (searchTerm.length > 2) {
+        handleSearchLocation(searchTerm);
+      }
     }
 
     if (selectedTags.length > 0) {
