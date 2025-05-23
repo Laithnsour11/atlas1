@@ -799,12 +799,46 @@ function PremiumApp() {
                       anchor="bottom"
                     >
                       <div 
-                        className="w-6 h-6 bg-blue-600 rounded-full border-2 border-white shadow-lg cursor-pointer hover:bg-blue-700 transition-colors flex items-center justify-center"
+                        className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full border-2 border-white shadow-lg cursor-pointer hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center transform hover:scale-110"
                         onClick={() => setSelectedAgent(agent)}
+                        title={agent.full_name}
                       >
-                        <Building2 className="w-3 h-3 text-white" />
+                        <User className="w-4 h-4 text-white" />
                       </div>
                     </Marker>
+                  )
+                ))}
+
+                {/* Coverage Areas - Heat Map Visualization */}
+                {filteredAgents.map((agent) => (
+                  agent.latitude && agent.longitude && (
+                    <Source
+                      key={`coverage-split-${agent.id}`}
+                      id={`coverage-split-${agent.id}`}
+                      type="geojson"
+                      data={{
+                        type: "Feature",
+                        geometry: {
+                          type: "Point",
+                          coordinates: [agent.longitude, agent.latitude]
+                        }
+                      }}
+                    >
+                      <Layer
+                        id={`coverage-circle-split-${agent.id}`}
+                        type="circle"
+                        paint={{
+                          'circle-radius': {
+                            stops: [[8, 4], [12, 12], [16, 25]]
+                          },
+                          'circle-color': '#3B82F6',
+                          'circle-opacity': 0.12,
+                          'circle-stroke-width': 1,
+                          'circle-stroke-color': '#2563EB',
+                          'circle-stroke-opacity': 0.25
+                        }}
+                      />
+                    </Source>
                   )
                 ))}
               </MapboxMap>
