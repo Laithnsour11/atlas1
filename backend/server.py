@@ -281,17 +281,7 @@ async def health_check():
 @api_router.get("/tags")
 async def get_predefined_tags():
     """Get list of customizable tags for agents"""
-    try:
-        # Try to get custom tags from database first
-        result = supabase.table('tag_settings').select("tags").limit(1).execute()
-        if result.data and result.data[0].get('tags'):
-            return {"tags": result.data[0]['tags']}
-        else:
-            # Return default tags if no custom tags exist
-            return {"tags": DEFAULT_TAGS}
-    except Exception as e:
-        # Fallback to default tags if database error
-        return {"tags": DEFAULT_TAGS}
+    return {"tags": get_custom_tags()}
 
 @api_router.get("/rating-levels")
 async def get_rating_levels():
