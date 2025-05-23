@@ -10,6 +10,10 @@ import uuid
 from datetime import datetime
 from supabase import create_client, Client
 import json
+import httpx
+import asyncio
+from bs4 import BeautifulSoup
+import re
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,219 +23,267 @@ supabase_url = os.environ['SUPABASE_URL']
 supabase_anon_key = os.environ['SUPABASE_ANON_KEY']
 supabase_service_key = os.environ['SUPABASE_SERVICE_KEY']
 
+# GoHighLevel configuration
+ghl_api_key = os.environ['GOHIGHLEVEL_API_KEY']
+ghl_base_url = os.environ['GOHIGHLEVEL_BASE_URL']
+
 # Create Supabase client (using service key for server-side operations)
 supabase: Client = create_client(supabase_url, supabase_service_key)
 
 # Create the main app without a prefix
-app = FastAPI(title="Atlas API", description="Real Estate Professional Directory")
+app = FastAPI(title="Atlas API", description="Real Estate Agent Directory")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Predefined tags for real estate agents
+PREDEFINED_TAGS = [
+    "Residential Sales", "Commercial Sales", "Luxury Properties", "Investment Properties",
+    "First-Time Buyers", "Military Relocation", "Senior Living", "New Construction",
+    "Foreclosures", "Short Sales", "Property Management", "Land Sales",
+    "Condominiums", "Townhomes", "Multi-Family", "Vacation Homes",
+    "Buyer Representation", "Seller Representation", "Relocation Services", "Staging Services"
+]
+
+# Service area types
+SERVICE_AREA_TYPES = ["city", "county", "state"]
+
 # Define Models
-class Professional(BaseModel):
+class Agent(BaseModel):
     id: Optional[str] = None
-    name: str
-    type: str  # 'agent', 'buyer', 'vendor'
-    company: Optional[str] = None
-    phone: Optional[str] = None
-    email: Optional[str] = None
-    website: Optional[str] = None
-    service_areas: List[str] = []
-    specialties: List[str] = []
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    full_name: str
+    brokerage: str
+    phone: str
+    email: str
+    website: str
+    service_area_type: str  # city, county, state
+    service_area: str  # actual area name
+    tags: List[str] = []
+    address_last_deal: str
+    submitted_by: str
+    notes: Optional[str] = None
+    profile_image: Optional[str] = None
     rating: Optional[float] = 0.0
     created_at: Optional[datetime] = None
 
-class ProfessionalCreate(BaseModel):
-    name: str
-    type: str
-    company: Optional[str] = None
-    phone: Optional[str] = None
-    email: Optional[str] = None
-    website: Optional[str] = None
-    service_areas: List[str] = []
-    specialties: List[str] = []
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+class AgentCreate(BaseModel):
+    full_name: str
+    brokerage: str
+    phone: str
+    email: str
+    website: str
+    service_area_type: str
+    service_area: str
+    tags: List[str] = []
+    address_last_deal: str
+    submitted_by: str
+    notes: Optional[str] = None
 
 class Comment(BaseModel):
     id: Optional[str] = None
-    professional_id: str
+    agent_id: str
     author_name: str
     content: str
     rating: Optional[int] = None  # 1-5 stars
     created_at: Optional[datetime] = None
 
 class CommentCreate(BaseModel):
-    professional_id: str
+    agent_id: str
     author_name: str
     content: str
     rating: Optional[int] = None
 
-class SuggestionCreate(BaseModel):
-    professional_id: Optional[str] = None
-    suggestion_type: str  # 'edit', 'new_contact', 'error_report'
-    content: str
-    submitter_name: Optional[str] = None
-    submitter_email: Optional[str] = None
+class GoHighLevelContact(BaseModel):
+    firstName: str
+    lastName: str
+    email: str
+    phone: str
+    website: Optional[str] = None
+    companyName: Optional[str] = None
+    source: str = "Atlas Directory"
+
+# Image scraping functions
+async def scrape_agent_image(full_name: str, website: str, service_area: str) -> Optional[str]:
+    """Try to scrape agent profile image from website or search"""
+    try:
+        # First try the website
+        if website:
+            image_url = await scrape_from_website(website, full_name)
+            if image_url:
+                return image_url
+        
+        # Then try Google search
+        search_query = f"{full_name} realtor {service_area}"
+        image_url = await search_agent_image(search_query)
+        return image_url
+    except Exception as e:
+        print(f"Error scraping image for {full_name}: {e}")
+        return None
+
+async def scrape_from_website(website: str, agent_name: str) -> Optional[str]:
+    """Scrape agent image from their website"""
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.get(website)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.content, 'html.parser')
+                
+                # Look for images with agent name in alt text or nearby text
+                images = soup.find_all('img')
+                for img in images:
+                    alt_text = img.get('alt', '').lower()
+                    src = img.get('src', '')
+                    
+                    # Check if agent name appears in alt text
+                    name_parts = agent_name.lower().split()
+                    if any(part in alt_text for part in name_parts) and src:
+                        # Convert relative URLs to absolute
+                        if src.startswith('//'):
+                            return f"https:{src}"
+                        elif src.startswith('/'):
+                            from urllib.parse import urljoin
+                            return urljoin(website, src)
+                        elif src.startswith('http'):
+                            return src
+    except Exception as e:
+        print(f"Error scraping website {website}: {e}")
+    return None
+
+async def search_agent_image(search_query: str) -> Optional[str]:
+    """Search for agent image online (mock implementation)"""
+    # Note: In production, you might use Google Custom Search API or similar
+    # For now, we'll return None as we don't want to make unauthorized API calls
+    return None
+
+# GoHighLevel integration
+async def create_ghl_contact(contact_data: GoHighLevelContact) -> dict:
+    """Create contact in GoHighLevel CRM"""
+    try:
+        async with httpx.AsyncClient() as client:
+            headers = {
+                "Authorization": f"Bearer {ghl_api_key}",
+                "Content-Type": "application/json"
+            }
+            
+            response = await client.post(
+                f"{ghl_base_url}contacts/",
+                json=contact_data.dict(),
+                headers=headers,
+                timeout=30
+            )
+            
+            if response.status_code in [200, 201]:
+                return {"status": "success", "data": response.json()}
+            else:
+                return {"status": "error", "message": f"GHL API error: {response.status_code}"}
+                
+    except Exception as e:
+        return {"status": "error", "message": f"Failed to create GHL contact: {str(e)}"}
 
 # Initialize database tables
 async def init_database():
     try:
-        # Create professionals table
-        professionals_table = """
-        CREATE TABLE IF NOT EXISTS professionals (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            name TEXT NOT NULL,
-            type TEXT NOT NULL,
-            company TEXT,
-            phone TEXT,
-            email TEXT,
-            website TEXT,
-            service_areas TEXT[],
-            specialties TEXT[],
-            latitude FLOAT,
-            longitude FLOAT,
-            rating FLOAT DEFAULT 0,
-            created_at TIMESTAMPTZ DEFAULT NOW()
-        );
-        """
-        
-        # Create comments table
-        comments_table = """
-        CREATE TABLE IF NOT EXISTS comments (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            professional_id UUID REFERENCES professionals(id) ON DELETE CASCADE,
-            author_name TEXT NOT NULL,
-            content TEXT NOT NULL,
-            rating INTEGER CHECK (rating >= 1 AND rating <= 5),
-            created_at TIMESTAMPTZ DEFAULT NOW()
-        );
-        """
-        
-        # Create suggestions table
-        suggestions_table = """
-        CREATE TABLE IF NOT EXISTS suggestions (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            professional_id UUID,
-            suggestion_type TEXT NOT NULL,
-            content TEXT NOT NULL,
-            submitter_name TEXT,
-            submitter_email TEXT,
-            status TEXT DEFAULT 'pending',
-            created_at TIMESTAMPTZ DEFAULT NOW()
-        );
-        """
-        
-        # Execute table creation (Note: In a real app, you'd use migrations)
-        # For now, we'll create tables via Supabase dashboard
-        print("Database initialization would happen here - create tables via Supabase dashboard")
-        
+        print("Database initialization - create tables via Supabase dashboard if needed")
     except Exception as e:
         print(f"Database initialization error: {e}")
 
 # API Routes
 @api_router.get("/")
 async def root():
-    return {"message": "Atlas API - Real Estate Professional Directory"}
+    return {"message": "Atlas API - Real Estate Agent Directory"}
 
 @api_router.get("/health")
 async def health_check():
     try:
         # Test Supabase connection
-        result = supabase.table('professionals').select("count").execute()
+        result = supabase.table('agents').select("count").execute()
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
 
-# Professionals endpoints
-@api_router.post("/professionals", response_model=Professional)
-async def create_professional(professional: ProfessionalCreate):
+@api_router.get("/tags")
+async def get_predefined_tags():
+    """Get list of predefined tags for agents"""
+    return {"tags": PREDEFINED_TAGS}
+
+@api_router.get("/service-area-types")
+async def get_service_area_types():
+    """Get available service area types"""
+    return {"types": SERVICE_AREA_TYPES}
+
+# Agents endpoints
+@api_router.post("/agents", response_model=Agent)
+async def create_agent(agent: AgentCreate):
     try:
-        professional_data = professional.dict()
-        result = supabase.table('professionals').insert(professional_data).execute()
+        # Validate that at least one tag is selected
+        if not agent.tags or len(agent.tags) == 0:
+            raise HTTPException(status_code=400, detail="At least one tag must be selected")
+        
+        agent_data = agent.dict()
+        
+        # Try to scrape profile image
+        profile_image = await scrape_agent_image(
+            agent.full_name, 
+            agent.website, 
+            agent.service_area
+        )
+        if profile_image:
+            agent_data['profile_image'] = profile_image
+        
+        result = supabase.table('agents').insert(agent_data).execute()
         if result.data:
-            return Professional(**result.data[0])
+            return Agent(**result.data[0])
         else:
-            raise HTTPException(status_code=400, detail="Failed to create professional")
+            raise HTTPException(status_code=400, detail="Failed to create agent")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get("/professionals", response_model=List[Professional])
-async def get_professionals(
-    search: Optional[str] = Query(None, description="Search by name, company, or area"),
-    type: Optional[str] = Query(None, description="Filter by type: agent, buyer, vendor"),
-    city: Optional[str] = Query(None, description="Filter by city/area"),
-    specialty: Optional[str] = Query(None, description="Filter by specialty"),
+@api_router.get("/agents", response_model=List[Agent])
+async def get_agents(
+    search: Optional[str] = Query(None, description="Search by name, brokerage, or area"),
+    service_area: Optional[str] = Query(None, description="Filter by service area"),
+    tags: Optional[str] = Query(None, description="Filter by tags (comma-separated)"),
+    submitted_by: Optional[str] = Query(None, description="Filter by submitted_by for 'My Agents' view"),
     limit: int = Query(100, description="Limit results")
 ):
     try:
-        query = supabase.table('professionals').select("*")
+        query = supabase.table('agents').select("*")
         
         # Apply filters
-        if type:
-            query = query.eq('type', type)
-        
         if search:
-            # Search in name, company, and service areas
-            search_filter = f"name.ilike.%{search}%,company.ilike.%{search}%"
+            # Search in name, brokerage, and service area
+            search_filter = f"full_name.ilike.%{search}%,brokerage.ilike.%{search}%,service_area.ilike.%{search}%"
             query = query.or_(search_filter)
         
-        if city:
-            query = query.contains('service_areas', [city])
+        if service_area:
+            query = query.ilike('service_area', f'%{service_area}%')
         
-        if specialty:
-            query = query.contains('specialties', [specialty])
+        if tags:
+            tag_list = [tag.strip() for tag in tags.split(',')]
+            for tag in tag_list:
+                query = query.contains('tags', [tag])
+        
+        if submitted_by:
+            query = query.eq('submitted_by', submitted_by)
         
         result = query.limit(limit).execute()
         
-        professionals = []
+        agents = []
         for item in result.data:
-            professionals.append(Professional(**item))
+            agents.append(Agent(**item))
         
-        return professionals
+        return agents
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Search with geo location - MUST come before {professional_id} route
-@api_router.get("/professionals/near")
-async def get_professionals_near(
-    latitude: float = Query(..., description="Latitude"),
-    longitude: float = Query(..., description="Longitude"),
-    radius_miles: float = Query(25, description="Search radius in miles"),
-    type: Optional[str] = Query(None, description="Filter by type")
-):
+@api_router.get("/agents/{agent_id}", response_model=Agent)
+async def get_agent(agent_id: str):
     try:
-        # Simple distance calculation (for production, use PostGIS)
-        # For now, we'll return all professionals and filter client-side
-        query = supabase.table('professionals').select("*")
-        
-        if type:
-            query = query.eq('type', type)
-        
-        result = query.execute()
-        
-        # Filter by distance (simple implementation)
-        professionals = []
-        for item in result.data:
-            if item.get('latitude') and item.get('longitude'):
-                # Add distance calculation here if needed
-                professionals.append(Professional(**item))
-        
-        return professionals
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.get("/professionals/{professional_id}", response_model=Professional)
-async def get_professional(professional_id: str):
-    try:
-        result = supabase.table('professionals').select("*").eq('id', professional_id).execute()
+        result = supabase.table('agents').select("*").eq('id', agent_id).execute()
         if result.data:
-            return Professional(**result.data[0])
+            return Agent(**result.data[0])
         else:
-            raise HTTPException(status_code=404, detail="Professional not found")
+            raise HTTPException(status_code=404, detail="Agent not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -248,10 +300,10 @@ async def create_comment(comment: CommentCreate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get("/professionals/{professional_id}/comments", response_model=List[Comment])
-async def get_professional_comments(professional_id: str):
+@api_router.get("/agents/{agent_id}/comments", response_model=List[Comment])
+async def get_agent_comments(agent_id: str):
     try:
-        result = supabase.table('comments').select("*").eq('professional_id', professional_id).order('created_at', desc=True).execute()
+        result = supabase.table('comments').select("*").eq('agent_id', agent_id).order('created_at', desc=True).execute()
         
         comments = []
         for item in result.data:
@@ -261,16 +313,62 @@ async def get_professional_comments(professional_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# Suggestions endpoint
-@api_router.post("/suggestions")
-async def create_suggestion(suggestion: SuggestionCreate):
+# GoHighLevel integration endpoint
+@api_router.post("/ghl/add-contact")
+async def add_to_gohighlevel(agent_id: str):
     try:
-        suggestion_data = suggestion.dict()
-        result = supabase.table('suggestions').insert(suggestion_data).execute()
-        if result.data:
-            return {"message": "Suggestion submitted successfully", "id": result.data[0]['id']}
-        else:
-            raise HTTPException(status_code=400, detail="Failed to submit suggestion")
+        # Get agent details
+        agent_result = supabase.table('agents').select("*").eq('id', agent_id).execute()
+        if not agent_result.data:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        
+        agent = Agent(**agent_result.data[0])
+        
+        # Split full name
+        name_parts = agent.full_name.split(' ', 1)
+        first_name = name_parts[0]
+        last_name = name_parts[1] if len(name_parts) > 1 else ""
+        
+        # Create GHL contact
+        contact_data = GoHighLevelContact(
+            firstName=first_name,
+            lastName=last_name,
+            email=agent.email,
+            phone=agent.phone,
+            website=agent.website,
+            companyName=agent.brokerage
+        )
+        
+        result = await create_ghl_contact(contact_data)
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Search location on map endpoint
+@api_router.get("/search-location")
+async def search_location(query: str):
+    """Search for location coordinates using a geocoding service"""
+    try:
+        # Using a simple geocoding approach - in production you might use Google Maps Geocoding API
+        # For now, return some sample coordinates for common areas
+        location_map = {
+            "manhattan": {"latitude": 40.7831, "longitude": -73.9712, "zoom": 12},
+            "brooklyn": {"latitude": 40.6782, "longitude": -73.9442, "zoom": 12},
+            "queens": {"latitude": 40.7282, "longitude": -73.7949, "zoom": 12},
+            "bronx": {"latitude": 40.8448, "longitude": -73.8648, "zoom": 12},
+            "staten island": {"latitude": 40.5795, "longitude": -74.1502, "zoom": 12},
+            "new york": {"latitude": 40.7128, "longitude": -74.0060, "zoom": 10},
+        }
+        
+        query_lower = query.lower()
+        for location, coords in location_map.items():
+            if location in query_lower:
+                return coords
+        
+        # Default to NYC if not found
+        return {"latitude": 40.7128, "longitude": -74.0060, "zoom": 10}
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
