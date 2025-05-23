@@ -342,6 +342,17 @@ function PremiumApp() {
             {/* Action Buttons */}
             <div className="flex items-center space-x-3">
               <button
+                onClick={() => setShowMyAgents(!showMyAgents)}
+                className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  showMyAgents 
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                My Agents
+              </button>
+              <button
                 onClick={() => setShowSettings(true)}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-white/60 rounded-lg transition-all duration-200"
               >
