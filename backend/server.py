@@ -48,6 +48,43 @@ PREDEFINED_TAGS = [
 # Service area types
 SERVICE_AREA_TYPES = ["city", "county", "state"]
 
+# New rating system
+RATING_LEVELS = {
+    "exceptional": {
+        "label": "Exceptional",
+        "description": "Rockstar agents who go above and beyond consistently on multiple deals",
+        "color": "#10B981",  # Green
+        "value": 5
+    },
+    "great": {
+        "label": "Great", 
+        "description": "Agents who have done a great job on one or multiple deals",
+        "color": "#3B82F6",  # Blue
+        "value": 4
+    },
+    "average": {
+        "label": "Average",
+        "description": "Agents who have done an average job getting deals moved",
+        "color": "#F59E0B",  # Yellow
+        "value": 3
+    },
+    "poor": {
+        "label": "Poor",
+        "description": "Agents who have had issues and probably wouldn't use again",
+        "color": "#EF4444",  # Red
+        "value": 2
+    },
+    "blacklist": {
+        "label": "Black List",
+        "description": "Never would use them again. Keep them away with a ten-foot pole",
+        "color": "#1F2937",  # Dark gray
+        "value": 1
+    }
+}
+
+# Admin settings password
+ADMIN_PASSWORD = "admin123"
+
 # Define Models
 class Agent(BaseModel):
     id: Optional[str] = None
