@@ -501,7 +501,7 @@ function App() {
       <div className="bg-white border-b border-gray-200 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search with Button */}
+            {/* Search with Autocomplete and Button */}
             <div className="flex-1 flex gap-2">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -510,13 +510,43 @@ function App() {
                   placeholder="Search address, city, or state..."
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => handleSearchInput(e.target.value)}
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
                       handleCommitSearch();
                     }
                   }}
+                  onFocus={() => {
+                    if (searchSuggestions.length > 0) {
+                      setShowSuggestions(true);
+                    }
+                  }}
                 />
+                
+                {/* Autocomplete Dropdown */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-50 max-h-60 overflow-y-auto">
+                    {searchSuggestions.map((suggestion) => (
+                      <div
+                        key={suggestion.id}
+                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                        onClick={() => handleSelectSuggestion(suggestion)}
+                      >
+                        <div className="flex items-center">
+                          <MapPin className="w-4 h-4 text-gray-400 mr-3 flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-900 truncate">
+                              {suggestion.place_name}
+                            </div>
+                            <div className="text-xs text-gray-500 capitalize">
+                              {suggestion.place_type?.join(', ')}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <button
                 onClick={handleCommitSearch}
