@@ -547,7 +547,10 @@ function PremiumApp() {
                     >
                       View Profile
                     </button>
-                    <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-sm font-medium">
+                    <button
+                      onClick={() => handleContactAgent(agent)}
+                      className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-sm font-medium"
+                    >
                       Contact
                     </button>
                   </div>
