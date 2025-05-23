@@ -79,13 +79,19 @@ function App() {
   useEffect(() => {
     let filtered = agents;
 
-    // Only filter by tags and "My Agents" - NOT by search term
+    // Filter by tags
     if (selectedTags.length > 0) {
       filtered = filtered.filter(a => 
         selectedTags.some(tag => a.tags?.includes(tag))
       );
     }
 
+    // Filter by minimum rating
+    if (minRating > 0) {
+      filtered = filtered.filter(a => (a.rating || 0) >= minRating);
+    }
+
+    // Filter by "My Agents"
     if (showMyAgents && currentUser) {
       filtered = filtered.filter(a => a.submitted_by === currentUser);
     }
@@ -106,7 +112,7 @@ function App() {
     }
 
     setFilteredAgents(filtered);
-  }, [selectedTags, agents, showMyAgents, currentUser, viewport]);
+  }, [selectedTags, minRating, agents, showMyAgents, currentUser, viewport]);
 
   const fetchAgents = async () => {
     try {
