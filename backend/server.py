@@ -130,6 +130,8 @@ class Agent(BaseModel):
     submitted_by: str
     notes: Optional[str] = None
     profile_image: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     rating: Optional[float] = 0.0
     created_at: Optional[datetime] = None
 
@@ -145,6 +147,8 @@ class AgentCreate(BaseModel):
     address_last_deal: str
     submitted_by: str
     notes: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 class Comment(BaseModel):
     id: Optional[str] = None
