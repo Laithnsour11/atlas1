@@ -366,17 +366,42 @@ function PremiumApp() {
         <div className="bg-white/60 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
           <form onSubmit={handleSearchSubmit} className="flex flex-col lg:flex-row gap-6 items-center">
             {/* Search */}
-            <div className="flex-1 w-full">
+            <div className="flex-1 w-full relative">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 z-10" />
                 <input
                   type="text"
                   placeholder="Search locations, agents, or brokerages..."
                   className="w-full pl-12 pr-4 py-3 bg-white/80 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-slate-900 placeholder-slate-500"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={handleSearchInputChange}
+                  onFocus={() => {
+                    if (searchSuggestions.length > 0) {
+                      setShowSuggestions(true);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Delay hiding suggestions to allow clicks
+                    setTimeout(() => setShowSuggestions(false), 150);
+                  }}
                 />
               </div>
+              
+              {/* Search Suggestions Dropdown */}
+              {showSuggestions && searchSuggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                  {searchSuggestions.map((suggestion) => (
+                    <button
+                      key={suggestion.id}
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-b-0 flex items-center"
+                    >
+                      <MapPin className="w-4 h-4 mr-3 text-slate-400 flex-shrink-0" />
+                      <span className="text-slate-700">{suggestion.text}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* View Controls */}
