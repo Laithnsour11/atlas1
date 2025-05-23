@@ -380,6 +380,13 @@ function PremiumApp() {
     }
   };
 
+  // Load comments when contact modal opens
+  useEffect(() => {
+    if (showContactModal && contactingAgent) {
+      fetchComments(contactingAgent.id);
+    }
+  }, [showContactModal, contactingAgent]);
+
   // Initial load
   useEffect(() => {
     const loadData = async () => {
