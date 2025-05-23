@@ -617,41 +617,22 @@ function App() {
                 >
                   <NavigationControl position="top-right" />
                   
-                  {/* Coverage Area Visualization */}
+                  {/* Coverage Area Visualization - Semi-transparent fills only */}
                   <Source id="coverage-areas" type="geojson" data={createCoverageHeatmap()}>
-                    {/* City/County filled areas */}
+                    {/* Semi-transparent blue fills for all coverage areas */}
                     <Layer
                       id="coverage-fill"
                       type="fill"
                       source="coverage-areas"
-                      filter={['in', ['get', 'service_area_type'], ['literal', ['city', 'county']]]}
                       paint={{
-                        'fill-color': '#3B82F6', // Blue color
-                        'fill-opacity': 0.2
-                      }}
-                    />
-                    {/* State outlines only */}
-                    <Layer
-                      id="coverage-outline-state"
-                      type="line"
-                      source="coverage-areas"
-                      filter={['==', ['get', 'service_area_type'], 'state']}
-                      paint={{
-                        'line-color': '#3B82F6', // Blue color
-                        'line-width': 2,
-                        'line-opacity': 0.8
-                      }}
-                    />
-                    {/* City/County outlines */}
-                    <Layer
-                      id="coverage-outline"
-                      type="line"
-                      source="coverage-areas"
-                      filter={['in', ['get', 'service_area_type'], ['literal', ['city', 'county']]]}
-                      paint={{
-                        'line-color': '#1D4ED8', // Darker blue
-                        'line-width': 1,
-                        'line-opacity': 0.6
+                        'fill-color': [
+                          'case',
+                          ['==', ['get', 'service_area_type'], 'city'], '#3B82F6', // Blue for cities
+                          ['==', ['get', 'service_area_type'], 'county'], '#6366F1', // Indigo for counties  
+                          ['==', ['get', 'service_area_type'], 'state'], '#8B5CF6', // Purple for states
+                          '#3B82F6' // Default blue
+                        ],
+                        'fill-opacity': 0.15 // Subtle semi-transparency
                       }}
                     />
                   </Source>
