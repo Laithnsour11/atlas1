@@ -195,6 +195,35 @@ async def get_professionals(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Search with geo location - MUST come before {professional_id} route
+@api_router.get("/professionals/near")
+async def get_professionals_near(
+    latitude: float = Query(..., description="Latitude"),
+    longitude: float = Query(..., description="Longitude"),
+    radius_miles: float = Query(25, description="Search radius in miles"),
+    type: Optional[str] = Query(None, description="Filter by type")
+):
+    try:
+        # Simple distance calculation (for production, use PostGIS)
+        # For now, we'll return all professionals and filter client-side
+        query = supabase.table('professionals').select("*")
+        
+        if type:
+            query = query.eq('type', type)
+        
+        result = query.execute()
+        
+        # Filter by distance (simple implementation)
+        professionals = []
+        for item in result.data:
+            if item.get('latitude') and item.get('longitude'):
+                # Add distance calculation here if needed
+                professionals.append(Professional(**item))
+        
+        return professionals
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/professionals/{professional_id}", response_model=Professional)
 async def get_professional(professional_id: str):
     try:
