@@ -340,8 +340,7 @@ async def delete_admin_tag(tag_name: str, password: str = Query(..., description
     
     try:
         # Get current tags
-        result = supabase.table('tag_settings').select("tags").limit(1).execute()
-        current_tags = result.data[0]['tags'] if result.data and result.data[0].get('tags') else DEFAULT_TAGS
+        current_tags = get_custom_tags()
         
         # Remove the tag
         updated_tags = [tag for tag in current_tags if tag != tag_name]
@@ -349,9 +348,14 @@ async def delete_admin_tag(tag_name: str, password: str = Query(..., description
         if len(updated_tags) == len(current_tags):
             raise HTTPException(status_code=404, detail="Tag not found")
         
-        # Update database
-        supabase.table('tag_settings').upsert({"id": 1, "tags": updated_tags}).execute()
-        return {"message": f"Tag '{tag_name}' deleted successfully", "tags": updated_tags}
+        # Save updated tags
+        success = save_custom_tags(updated_tags)
+        if success:
+            return {"message": f"Tag '{tag_name}' deleted successfully", "tags": updated_tags}
+        else:
+            return {"message": f"Tag '{tag_name}' deleted from fallback storage", "tags": updated_tags, "warning": "Database table not available"}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
