@@ -243,7 +243,49 @@ function PremiumApp() {
     }
   };
 
-  // Admin functions
+  // Agent form functions
+  const handleAddAgent = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await axios.post(`${API}/agents`, newAgent);
+      if (response.data) {
+        await fetchAgents(); // Refresh the agent list
+        setShowAddForm(false);
+        setNewAgent({
+          full_name: '',
+          brokerage: '',
+          phone: '',
+          email: '',
+          website: '',
+          service_area_type: 'city',
+          service_area: '',
+          tags: [],
+          address_last_deal: '',
+          submitted_by: '',
+          notes: ''
+        });
+        alert('Agent added successfully!');
+      }
+    } catch (error) {
+      console.error('Error adding agent:', error);
+      alert('Error adding agent. Please try again.');
+    }
+  };
+
+  const handleTagSelect = (tag) => {
+    if (newAgent.tags.includes(tag)) {
+      setNewAgent(prev => ({
+        ...prev,
+        tags: prev.tags.filter(t => t !== tag)
+      }));
+    } else {
+      setNewAgent(prev => ({
+        ...prev,
+        tags: [...prev.tags, tag]
+      }));
+    }
+  };
   const authenticateAdmin = async (password) => {
     try {
       const response = await axios.post(`${API}/admin/auth`, { password });
