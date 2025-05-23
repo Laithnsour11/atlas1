@@ -599,7 +599,7 @@ function App() {
           {(viewMode === 'map' || viewMode === 'both') && (
             <div className={`${viewMode === 'both' ? 'w-1/2' : 'w-full'} ${viewMode === 'map' ? 'h-screen' : 'h-[calc(100vh-200px)]'}`}>
               <div className="h-full rounded-lg overflow-hidden shadow-md">
-                <Map
+                <MapboxMap
                   {...viewport}
                   onMove={evt => setViewport(evt.viewState)}
                   mapboxAccessToken={MAPBOX_TOKEN}
@@ -654,7 +654,7 @@ function App() {
                       </Marker>
                     );
                   })}
-                </Map>
+                </MapboxMap>
               </div>
             </div>
           )}
