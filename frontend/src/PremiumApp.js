@@ -804,6 +804,11 @@ function PremiumApp() {
                       <div className="flex items-center text-slate-600">
                         <Building2 className="w-4 h-4 mr-2" />
                         <span>Area: {agent.service_area}</span>
+                        {getStateFromServiceArea(agent.service_area) && (
+                          <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                            {getStateFromServiceArea(agent.service_area)}
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center text-slate-600">
                         <Phone className="w-4 h-4 mr-2" />
