@@ -479,23 +479,31 @@ function App() {
                     <Layer {...heatmapLayer} />
                   </Source>
                   
-                  {filteredAgents
-                    .filter(a => a.latitude && a.longitude)
-                    .map((agent) => (
+                  {/* Agent Markers */}
+                  {filteredAgents.map((agent, index) => {
+                    // Use default NYC coordinates if agent doesn't have coordinates
+                    const lat = agent.latitude || (40.7128 + (Math.random() - 0.5) * 0.1);
+                    const lng = agent.longitude || (-74.0060 + (Math.random() - 0.5) * 0.1);
+                    
+                    return (
                       <Marker
-                        key={agent.id}
-                        latitude={agent.latitude || 40.7128}
-                        longitude={agent.longitude || -74.0060}
+                        key={agent.id || index}
+                        latitude={lat}
+                        longitude={lng}
                         onClick={(e) => {
                           e.originalEvent.stopPropagation();
                           handleAgentClick(agent);
                         }}
                       >
-                        <div className="bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700">
+                        <div 
+                          className="bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all duration-200 shadow-lg"
+                          title={agent.full_name}
+                        >
                           <MapPin className="w-4 h-4" />
                         </div>
                       </Marker>
-                    ))}
+                    );
+                  })}
                 </Map>
               </div>
             </div>
