@@ -44,6 +44,19 @@ function App() {
     zoom: 10
   });
 
+  // Get viewport bounds for filtering agents
+  const getViewportBounds = () => {
+    const latOffset = 0.1 / Math.pow(2, viewport.zoom - 10);
+    const lngOffset = 0.1 / Math.pow(2, viewport.zoom - 10);
+    
+    return {
+      north: viewport.latitude + latOffset,
+      south: viewport.latitude - latOffset,
+      east: viewport.longitude + lngOffset,
+      west: viewport.longitude - lngOffset
+    };
+  };
+
   // Fetch agents and tags
   useEffect(() => {
     fetchAgents();
@@ -92,19 +105,6 @@ function App() {
 
     setFilteredAgents(filtered);
   }, [selectedTags, agents, showMyAgents, currentUser, viewport]);
-
-  // Get viewport bounds for filtering agents
-  const getViewportBounds = () => {
-    const latOffset = 0.1 / Math.pow(2, viewport.zoom - 10);
-    const lngOffset = 0.1 / Math.pow(2, viewport.zoom - 10);
-    
-    return {
-      north: viewport.latitude + latOffset,
-      south: viewport.latitude - latOffset,
-      east: viewport.longitude + lngOffset,
-      west: viewport.longitude - lngOffset
-    };
-  };
 
   const fetchAgents = async () => {
     try {
