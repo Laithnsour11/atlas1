@@ -121,14 +121,24 @@ class Comment(BaseModel):
     agent_id: str
     author_name: str
     content: str
-    rating: Optional[int] = None  # 1-5 stars
+    rating: Optional[str] = None  # Now uses rating keys: exceptional, great, average, poor, blacklist
     created_at: Optional[datetime] = None
 
 class CommentCreate(BaseModel):
     agent_id: str
     author_name: str
     content: str
-    rating: Optional[int] = None
+    rating: Optional[str] = None  # Now uses rating keys
+
+class TagSettings(BaseModel):
+    tags: List[str]
+
+class AdminAuth(BaseModel):
+    password: str
+
+class CustomTag(BaseModel):
+    name: str
+    order: Optional[int] = None
 
 class GoHighLevelContact(BaseModel):
     firstName: str
