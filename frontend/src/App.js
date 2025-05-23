@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Map as MapboxMap, Marker, NavigationControl, Source, Layer } from 'react-map-gl';
-import { Search, MapPin, Phone, Mail, Globe, Star, MessageCircle, Plus, Filter, List, Users, Building2, X, Send, ExternalLink, UserPlus, Eye } from 'lucide-react';
-import './App.css';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React from 'react';
+import PremiumApp from './PremiumApp';
+
+function App() {
+  return <PremiumApp />;
+}
+
+export default App;
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
