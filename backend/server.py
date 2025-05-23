@@ -85,6 +85,21 @@ RATING_LEVELS = {
 # Admin settings password
 ADMIN_PASSWORD = "admin123"
 
+def create_tag_settings_table():
+    """Create tag_settings table if it doesn't exist"""
+    try:
+        # Try to create the table
+        result = supabase.table('tag_settings').select("id").limit(1).execute()
+        print("tag_settings table already exists")
+    except Exception as e:
+        print(f"Creating tag_settings table: {e}")
+        try:
+            # Create the table using raw SQL
+            supabase.rpc('create_tag_settings_table').execute()
+        except Exception as create_error:
+            print(f"Could not create tag_settings table: {create_error}")
+            # We'll handle this gracefully in the API endpoints
+
 # Define Models
 class Agent(BaseModel):
     id: Optional[str] = None
