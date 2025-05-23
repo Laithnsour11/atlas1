@@ -769,9 +769,9 @@ function App() {
                       {[0, 1, 2, 3, 4, 5].map((rating) => (
                         <button
                           key={rating}
-                          onClick={() => setMinRating(rating)}
+                          onClick={() => setTempMinRating(rating)}
                           className={`flex items-center px-3 py-2 rounded-lg border transition-colors ${
-                            minRating === rating
+                            tempMinRating === rating
                               ? 'bg-blue-600 text-white border-blue-600'
                               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                           }`}
@@ -799,9 +799,9 @@ function App() {
                       {predefinedTags.map((tag, index) => (
                         <button
                           key={index}
-                          onClick={() => handleTagToggle(tag)}
+                          onClick={() => handleTempTagToggle(tag)}
                           className={`px-3 py-2 text-sm rounded-lg text-left transition-colors ${
-                            selectedTags.includes(tag)
+                            tempSelectedTags.includes(tag)
                               ? 'bg-blue-600 text-white'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
@@ -812,20 +812,29 @@ function App() {
                     </div>
                   </div>
 
-                  {/* Clear Filters */}
-                  {(selectedTags.length > 0 || minRating > 0) && (
-                    <div className="flex justify-end">
+                  {/* Apply/Reset Buttons */}
+                  <div className="flex justify-between items-center pt-2 border-t">
+                    <button
+                      onClick={resetFilters}
+                      className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50"
+                    >
+                      Reset
+                    </button>
+                    <div className="flex gap-2">
                       <button
-                        onClick={() => {
-                          setSelectedTags([]);
-                          setMinRating(0);
-                        }}
+                        onClick={() => setShowFilters(false)}
                         className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
                       >
-                        Clear All Filters
+                        Cancel
+                      </button>
+                      <button
+                        onClick={applyFilters}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Apply Filters
                       </button>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
             </div>
