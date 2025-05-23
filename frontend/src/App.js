@@ -20,6 +20,9 @@ function App() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [minRating, setMinRating] = useState(0);
+  // Temporary filter states (for apply/reset pattern)
+  const [tempSelectedTags, setTempSelectedTags] = useState([]);
+  const [tempMinRating, setTempMinRating] = useState(0);
   const [selectedAgent, setSelectedAgent] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState({ author_name: '', content: '', rating: 5 });
