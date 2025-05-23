@@ -295,6 +295,35 @@ function App() {
     );
   };
 
+  const handleTempTagToggle = (tag) => {
+    setTempSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const applyFilters = () => {
+    setSelectedTags(tempSelectedTags);
+    setMinRating(tempMinRating);
+    setShowFilters(false);
+  };
+
+  const resetFilters = () => {
+    setTempSelectedTags([]);
+    setTempMinRating(0);
+    setSelectedTags([]);
+    setMinRating(0);
+    setShowFilters(false);
+  };
+
+  const openFilters = () => {
+    // Initialize temp states with current filter values
+    setTempSelectedTags([...selectedTags]);
+    setTempMinRating(minRating);
+    setShowFilters(true);
+  };
+
   const renderStars = (rating) => {
     return [...Array(5)].map((_, i) => (
       <Star
