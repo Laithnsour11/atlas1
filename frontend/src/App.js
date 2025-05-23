@@ -50,18 +50,11 @@ function App() {
     fetchPredefinedTags();
   }, []);
 
-  // Filter agents when search or filters change
+  // Filter agents based on tags and viewport (not search)
   useEffect(() => {
     let filtered = agents;
 
-    if (searchTerm) {
-      filtered = filtered.filter(a => 
-        a.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        a.brokerage?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        a.service_area?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
+    // Only filter by tags and "My Agents" - NOT by search term
     if (selectedTags.length > 0) {
       filtered = filtered.filter(a => 
         selectedTags.some(tag => a.tags?.includes(tag))
@@ -72,8 +65,36 @@ function App() {
       filtered = filtered.filter(a => a.submitted_by === currentUser);
     }
 
+    // Filter by viewport (agents visible in current map area)
+    if (viewport.latitude && viewport.longitude) {
+      const viewportBounds = getViewportBounds();
+      filtered = filtered.filter(agent => {
+        const agentHash = agent.id ? agent.id.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0) : 0;
+        const lat = agent.latitude || (40.7128 + ((agentHash % 100) - 50) * 0.001);
+        const lng = agent.longitude || (-74.0060 + ((agentHash % 100) - 50) * 0.001);
+        
+        return lat >= viewportBounds.south && 
+               lat <= viewportBounds.north && 
+               lng >= viewportBounds.west && 
+               lng <= viewportBounds.east;
+      });
+    }
+
     setFilteredAgents(filtered);
-  }, [searchTerm, selectedTags, agents, showMyAgents, currentUser]);
+  }, [selectedTags, agents, showMyAgents, currentUser, viewport]);
+
+  // Get viewport bounds for filtering agents
+  const getViewportBounds = () => {
+    const latOffset = 0.1 / Math.pow(2, viewport.zoom - 10); // Adjust based on zoom
+    const lngOffset = 0.1 / Math.pow(2, viewport.zoom - 10);
+    
+    return {
+      north: viewport.latitude + latOffset,
+      south: viewport.latitude - latOffset,
+      east: viewport.longitude + lngOffset,
+      west: viewport.longitude - lngOffset
+    };
+  };
 
   const fetchAgents = async () => {
     try {
