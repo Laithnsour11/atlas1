@@ -581,72 +581,129 @@ function App() {
             </div>
           </div>
 
-          {/* Tags Filter */}
+          {/* Filters Section */}
           <div className="mt-4">
-            <div className="flex flex-col lg:flex-row gap-4">
-              {/* Rating Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Rating:</label>
-                <div className="flex gap-2">
-                  {[0, 1, 2, 3, 4, 5].map((rating) => (
-                    <button
-                      key={rating}
-                      onClick={() => setMinRating(rating)}
-                      className={`flex items-center px-3 py-1 rounded-lg border transition-colors ${
-                        minRating === rating
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      {rating === 0 ? (
-                        <span className="text-sm">Any</span>
-                      ) : (
-                        <div className="flex items-center">
-                          <span className="mr-1 text-sm">{rating}</span>
-                          <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                          <span className="ml-1 text-sm">+</span>
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={openFilters}
+                  className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+                    showFilters 
+                      ? 'bg-indigo-600 text-white' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <Filter className="w-4 h-4 mr-2" />
+                  Filters
+                  {(selectedTags.length > 0 || minRating > 0) && (
+                    <span className="ml-2 bg-blue-600 text-white text-xs rounded-full px-2 py-1">
+                      {selectedTags.length + (minRating > 0 ? 1 : 0)}
+                    </span>
+                  )}
+                </button>
+                
+                {/* Active Filters Display */}
+                {(selectedTags.length > 0 || minRating > 0) && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <span>Active filters:</span>
+                    {minRating > 0 && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                        {minRating}+ stars
+                      </span>
+                    )}
+                    {selectedTags.slice(0, 3).map((tag, index) => (
+                      <span key={index} className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                    {selectedTags.length > 3 && (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full">
+                        +{selectedTags.length - 3} more
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
+            </div>
 
-              {/* Tag Filter */}
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Tags:</label>
-                <div className="flex flex-wrap gap-2">
-                  {predefinedTags.slice(0, 10).map((tag, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleTagToggle(tag)}
-                      className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                        selectedTags.includes(tag)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
+            {/* Expandable Filter Form */}
+            {showFilters && (
+              <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Rating Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Minimum Rating:</label>
+                    <div className="flex gap-2">
+                      {[0, 1, 2, 3, 4, 5].map((rating) => (
+                        <button
+                          key={rating}
+                          onClick={() => setTempMinRating(rating)}
+                          className={`flex items-center px-3 py-1 rounded-lg border transition-colors ${
+                            tempMinRating === rating
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {rating === 0 ? (
+                            <span className="text-sm">Any</span>
+                          ) : (
+                            <div className="flex items-center">
+                              <span className="mr-1 text-sm">{rating}</span>
+                              <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                              <span className="ml-1 text-sm">+</span>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tag Filter */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Tags:</label>
+                    <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                      {predefinedTags.map((tag, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleTempTagToggle(tag)}
+                          className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                            tempSelectedTags.includes(tag)
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Clear Filters */}
-              {(selectedTags.length > 0 || minRating > 0) && (
-                <div className="flex items-end">
+                {/* Apply/Reset Buttons */}
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
                   <button
-                    onClick={() => {
-                      setSelectedTags([]);
-                      setMinRating(0);
-                    }}
+                    onClick={resetFilters}
                     className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
-                    Clear Filters
+                    Reset
                   </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowFilters(false)}
+                      className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={applyFilters}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
