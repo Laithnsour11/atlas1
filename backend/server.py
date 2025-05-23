@@ -36,7 +36,7 @@ app = FastAPI(title="Atlas API", description="Real Estate Agent Directory")
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-# Predefined tags for real estate agents
+# Default tags (can be customized via admin settings)
 PREDEFINED_TAGS = [
     "Residential Sales", "Commercial Sales", "Luxury Properties", "Investment Properties",
     "First-Time Buyers", "Military Relocation", "Senior Living", "New Construction",
