@@ -22,7 +22,7 @@ function App() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState({ author_name: '', content: '', rating: 5 });
   const [showAddForm, setShowAddForm] = useState(false);
-  const [currentUser, setCurrentUser] = useState(''); // For "My Agents" feature
+  const [currentUser, setCurrentUser] = useState('');
   const [showMyAgents, setShowMyAgents] = useState(false);
   const [newAgent, setNewAgent] = useState({
     full_name: '',
@@ -37,7 +37,7 @@ function App() {
     submitted_by: '',
     notes: ''
   });
-  const [viewMode, setViewMode] = useState('both'); // 'list', 'map', 'both'
+  const [viewMode, setViewMode] = useState('both');
   const [viewport, setViewport] = useState({
     latitude: 40.7128,
     longitude: -74.0060,
@@ -60,7 +60,7 @@ function App() {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Filter agents based on tags and viewport (not search)
+  // Filter agents based on tags and viewport
   useEffect(() => {
     let filtered = agents;
 
@@ -95,7 +95,7 @@ function App() {
 
   // Get viewport bounds for filtering agents
   const getViewportBounds = () => {
-    const latOffset = 0.1 / Math.pow(2, viewport.zoom - 10); // Adjust based on zoom
+    const latOffset = 0.1 / Math.pow(2, viewport.zoom - 10);
     const lngOffset = 0.1 / Math.pow(2, viewport.zoom - 10);
     
     return {
@@ -240,7 +240,7 @@ function App() {
           const suggestions = data.features.map(feature => ({
             id: feature.id,
             place_name: feature.place_name,
-            center: feature.center, // [longitude, latitude]
+            center: feature.center,
             place_type: feature.place_type
           }));
           setSearchSuggestions(suggestions);
@@ -263,7 +263,7 @@ function App() {
     
     // Navigate to selected location
     setViewport({
-      latitude: suggestion.center[1], // Mapbox returns [lng, lat]
+      latitude: suggestion.center[1],
       longitude: suggestion.center[0],
       zoom: 14
     });
@@ -359,34 +359,12 @@ function App() {
     </div>
   );
 
-  // Create heat map data for comments
-  const createHeatmapData = () => {
-    const features = filteredAgents
-      .filter(agent => agent.latitude && agent.longitude)
-      .map(agent => ({
-        type: 'Feature',
-        properties: {
-          weight: comments.filter(c => c.agent_id === agent.id).length || 1
-        },
-        geometry: {
-          type: 'Point',
-          coordinates: [agent.longitude, agent.latitude]
-        }
-      }));
-
-    return {
-      type: 'FeatureCollection',
-      features
-    };
-  };
-
   // Create coverage area visualization (non-overlapping blue areas)
   const createCoverageHeatmap = () => {
-    const agentLocations = new Map(); // Track locations to prevent overlap
+    const agentLocations = new Map();
     const features = [];
     
     filteredAgents.forEach((agent, index) => {
-      // Generate consistent coordinates for each agent
       const agentHash = agent.id ? agent.id.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0) : index;
       const lat = agent.latitude || (40.7128 + ((agentHash % 100) - 50) * 0.001);
       const lng = agent.longitude || (-74.0060 + ((agentHash % 100) - 50) * 0.001);
@@ -394,7 +372,7 @@ function App() {
       // Create location key for overlap detection
       const locationKey = `${Math.round(lat * 1000)}-${Math.round(lng * 1000)}`;
       
-      // Skip if we already have an agent at this location (prevent overlap)
+      // Skip if we already have an agent at this location
       if (agentLocations.has(locationKey)) {
         return;
       }
@@ -404,20 +382,20 @@ function App() {
       let radiusKm;
       switch (agent.service_area_type) {
         case 'city':
-          radiusKm = 8; // Smaller radius for cities
+          radiusKm = 8;
           break;
         case 'county':
-          radiusKm = 20; // Medium radius for counties
+          radiusKm = 20;
           break;
         case 'state':
-          radiusKm = 50; // Large radius for states
+          radiusKm = 50;
           break;
         default:
           radiusKm = 12;
       }
       
-      // Create circle polygon with more natural curves
-      const steps = 32; // Fewer steps for smoother performance
+      // Create circle polygon
+      const steps = 32;
       const coordinates = [];
       for (let i = 0; i < steps; i++) {
         const angle = (i / steps) * 2 * Math.PI;
@@ -425,7 +403,7 @@ function App() {
         const dy = radiusKm * 0.009 * Math.sin(angle);
         coordinates.push([lng + dx, lat + dy]);
       }
-      coordinates.push(coordinates[0]); // Close the polygon
+      coordinates.push(coordinates[0]);
       
       features.push({
         type: 'Feature',
@@ -445,32 +423,6 @@ function App() {
       type: 'FeatureCollection',
       features
     };
-  };
-
-
-
-  const heatmapLayer = {
-    id: 'heatmap',
-    type: 'heatmap',
-    source: 'agents',
-    maxzoom: 15,
-    paint: {
-      'heatmap-weight': ['get', 'weight'],
-      'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, 15, 3],
-      'heatmap-color': [
-        'interpolate',
-        ['linear'],
-        ['heatmap-density'],
-        0, 'rgba(33, 102, 172, 0)',
-        0.2, 'rgb(103, 169, 207)',
-        0.4, 'rgb(209, 229, 240)',
-        0.6, 'rgb(253, 219, 199)',
-        0.8, 'rgb(239, 138, 98)',
-        1, 'rgb(178, 24, 43)'
-      ],
-      'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, 15, 20],
-      'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 7, 1, 15, 0]
-    }
   };
 
   return (
@@ -632,7 +584,7 @@ function App() {
                 ) : filteredAgents.length === 0 ? (
                   <div className="text-center py-8">
                     <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-slate-600">No agents found matching your criteria.</p>
+                    <p className="text-slate-600">No agents found in current view.</p>
                   </div>
                 ) : (
                   filteredAgents.map((agent) => (
@@ -657,9 +609,8 @@ function App() {
                 >
                   <NavigationControl position="top-right" />
                   
-                  {/* Coverage Area Visualization - Semi-transparent fills only */}
+                  {/* Coverage Area Visualization */}
                   <Source id="coverage-areas" type="geojson" data={createCoverageHeatmap()}>
-                    {/* Semi-transparent blue fills for all coverage areas */}
                     <Layer
                       id="coverage-fill"
                       type="fill"
@@ -667,19 +618,18 @@ function App() {
                       paint={{
                         'fill-color': [
                           'case',
-                          ['==', ['get', 'service_area_type'], 'city'], '#3B82F6', // Blue for cities
-                          ['==', ['get', 'service_area_type'], 'county'], '#6366F1', // Indigo for counties  
-                          ['==', ['get', 'service_area_type'], 'state'], '#8B5CF6', // Purple for states
-                          '#3B82F6' // Default blue
+                          ['==', ['get', 'service_area_type'], 'city'], '#3B82F6',
+                          ['==', ['get', 'service_area_type'], 'county'], '#6366F1',
+                          ['==', ['get', 'service_area_type'], 'state'], '#8B5CF6',
+                          '#3B82F6'
                         ],
-                        'fill-opacity': 0.15 // Subtle semi-transparency
+                        'fill-opacity': 0.15
                       }}
                     />
                   </Source>
                   
-                  {/* Agent Markers - Stable positioning */}
+                  {/* Agent Markers */}
                   {filteredAgents.map((agent, index) => {
-                    // Generate consistent coordinates for each agent
                     const agentHash = agent.id ? agent.id.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0) : index;
                     const lat = agent.latitude || (40.7128 + ((agentHash % 100) - 50) * 0.001);
                     const lng = agent.longitude || (-74.0060 + ((agentHash % 100) - 50) * 0.001);
@@ -989,7 +939,7 @@ function App() {
                   value={newAgent.submitted_by}
                   onChange={(e) => {
                     setNewAgent({...newAgent, submitted_by: e.target.value});
-                    setCurrentUser(e.target.value); // Set for "My Agents" feature
+                    setCurrentUser(e.target.value);
                   }}
                 />
 
