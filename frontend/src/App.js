@@ -567,6 +567,113 @@ function App() {
       {viewMode === 'map' ? (
         // Full screen map mode
         <div className="fixed inset-0 top-16 z-10">
+          {/* Floating Search Panel for Map Mode */}
+          <div className="absolute top-4 left-4 right-4 z-20 bg-white rounded-lg shadow-lg p-4">
+            <div className="flex flex-col gap-4">
+              {/* Search with Autocomplete and Button */}
+              <div className="flex gap-2">
+                <div className="flex-1 relative search-container">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Search address, city, or state..."
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={searchTerm}
+                    onChange={(e) => handleSearchInput(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleCommitSearch();
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchSuggestions.length > 0) {
+                        setShowSuggestions(true);
+                      }
+                    }}
+                  />
+                  
+                  {/* Autocomplete Dropdown */}
+                  {showSuggestions && searchSuggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-50 max-h-60 overflow-y-auto">
+                      {searchSuggestions.map((suggestion) => (
+                        <div
+                          key={suggestion.id}
+                          className="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                          onClick={() => handleSelectSuggestion(suggestion)}
+                        >
+                          <div className="flex items-center">
+                            <MapPin className="w-4 h-4 text-gray-400 mr-3 flex-shrink-0" />
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-gray-900 truncate">
+                                {suggestion.place_name}
+                              </div>
+                              <div className="text-xs text-gray-500 capitalize">
+                                {suggestion.place_type?.join(', ')}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handleCommitSearch}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Search
+                </button>
+
+                {/* View Mode Toggle */}
+                <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-3 py-2 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+                    title="List View"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('both')}
+                    className={`px-3 py-2 ${viewMode === 'both' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+                    title="Split View"
+                  >
+                    <Filter className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('map')}
+                    className={`px-3 py-2 ${viewMode === 'map' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+                    title="Map Only"
+                  >
+                    <MapPin className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Tags Filter - Compact Version for Map Mode */}
+              <div className="flex flex-wrap gap-2">
+                <span className="text-sm font-medium text-gray-700 mr-2">Tags:</span>
+                {predefinedTags.slice(0, 6).map((tag, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleTagToggle(tag)}
+                    className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                      selectedTags.includes(tag)
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+                {predefinedTags.length > 6 && (
+                  <span className="text-xs text-gray-500 py-1">+{predefinedTags.length - 6} more</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Full Screen Map */}
           <div className="h-full w-full">
             <MapboxMap
               {...viewport}
@@ -624,6 +731,35 @@ function App() {
                 );
               })}
             </MapboxMap>
+          </div>
+
+          {/* Floating Agent Count */}
+          <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg px-4 py-2 z-20">
+            <span className="text-sm font-medium text-slate-800">
+              {filteredAgents.length} Agents Found {showMyAgents ? '(My Submissions)' : ''}
+            </span>
+          </div>
+
+          {/* Floating Action Buttons */}
+          <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-20">
+            <button
+              onClick={() => setShowMyAgents(!showMyAgents)}
+              className={`flex items-center px-3 py-2 rounded-lg shadow-lg transition-colors ${
+                showMyAgents 
+                  ? 'bg-indigo-600 text-white' 
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              My Agents
+            </button>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Agent
+            </button>
           </div>
         </div>
       ) : (
