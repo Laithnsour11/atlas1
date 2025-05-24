@@ -35,6 +35,8 @@ function PremiumApp() {
   const [showSettings, setShowSettings] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [analyticsData, setAnalyticsData] = useState(null);
   const [newAgent, setNewAgent] = useState({
     full_name: '',
     brokerage: '',
