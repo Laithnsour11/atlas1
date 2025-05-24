@@ -31,6 +31,7 @@ function PremiumApp() {
   const [contactingAgent, setContactingAgent] = useState(null);
   const [currentUser, setCurrentUser] = useState('');
   const [showMyAgents, setShowMyAgents] = useState(false);
+  const [showMapViewFilter, setShowMapViewFilter] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
