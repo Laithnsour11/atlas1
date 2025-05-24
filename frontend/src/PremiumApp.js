@@ -132,6 +132,8 @@ function PremiumApp() {
     
     return Object.values(groupedAreas);
   };
+
+  // Helper function to check if agent is in viewport
   const isAgentInViewport = (agent) => {
     if (!agent.latitude || !agent.longitude) return false;
     
