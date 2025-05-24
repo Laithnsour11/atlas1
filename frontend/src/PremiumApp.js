@@ -448,6 +448,8 @@ function PremiumApp() {
     a.click();
     window.URL.revokeObjectURL(url);
   };
+
+  // Admin functions
   const authenticateAdmin = async (password) => {
     try {
       const response = await axios.post(`${API}/admin/auth`, { password });
