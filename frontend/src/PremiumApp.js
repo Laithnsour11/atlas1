@@ -566,7 +566,7 @@ function PremiumApp() {
       });
     }
 
-    // Filter by "My Agents"
+    // Filter by "Submissions" (formerly My Agents)
     if (showMyAgents && currentUser) {
       filtered = filtered.filter(a => a.submitted_by === currentUser);
     }
