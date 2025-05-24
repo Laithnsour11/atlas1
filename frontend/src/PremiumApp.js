@@ -332,7 +332,7 @@ function PremiumApp() {
     try {
       const response = await axios.get(`${API}/search-location?query=${encodeURIComponent(searchQuery)}`);
       if (response.data && response.data.latitude && response.data.longitude) {
-        setViewport({
+        updateViewport({
           latitude: response.data.latitude,
           longitude: response.data.longitude,
           zoom: response.data.zoom || 12
