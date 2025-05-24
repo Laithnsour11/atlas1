@@ -450,8 +450,13 @@ function PremiumApp() {
       filtered = filtered.filter(a => a.submitted_by === currentUser);
     }
 
+    // Filter by map viewport (only show agents in current map view)
+    if (showMapViewFilter && (viewMode === 'map' || viewMode === 'both')) {
+      filtered = filtered.filter(a => isAgentInViewport(a));
+    }
+
     setFilteredAgents(filtered);
-  }, [agents, selectedTags, minRating, showMyAgents, currentUser, ratingLevels]);
+  }, [agents, selectedTags, minRating, showMyAgents, currentUser, ratingLevels, showMapViewFilter, viewport, viewMode]);
 
   if (loading) {
     return (
