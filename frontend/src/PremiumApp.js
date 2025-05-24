@@ -1123,8 +1123,8 @@ function PremiumApp() {
                         <h3 className="text-lg font-bold text-slate-900 mb-1">{agent.full_name}</h3>
                         <p className="text-slate-600 font-medium">{agent.brokerage}</p>
                       </div>
-                      {ratingDisplay && (
-                        <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-3">
+                        {ratingDisplay && (
                           <div
                             className="p-2 rounded-lg"
                             style={{ backgroundColor: `${ratingDisplay.color}20`, color: ratingDisplay.color }}
@@ -1132,8 +1132,15 @@ function PremiumApp() {
                           >
                             {ratingDisplay.icon}
                           </div>
-                        </div>
-                      )}
+                        )}
+                        {/* State Outline Visual */}
+                        {getStateFromServiceArea(agent.service_area) && (
+                          <div className="flex flex-col items-center" title={`${getStateFromServiceArea(agent.service_area)} State`}>
+                            {getStateOutlineSVG(getStateFromServiceArea(agent.service_area))}
+                            <span className="text-xs text-slate-500 mt-1">{getStateFromServiceArea(agent.service_area)}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Agent Info */}
