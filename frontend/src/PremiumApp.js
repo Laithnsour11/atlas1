@@ -382,7 +382,72 @@ function PremiumApp() {
     }
   };
 
-  // Admin functions
+  // Analytics functions
+  const generateAnalytics = () => {
+    const totalAgents = agents.length;
+    const agentsWithCoords = agents.filter(a => a.latitude && a.longitude).length;
+    const agentsByState = {};
+    const agentsByRating = {};
+    const agentsByTags = {};
+    
+    agents.forEach(agent => {
+      // Count by state
+      const state = getStateFromServiceArea(agent.service_area);
+      if (state) {
+        agentsByState[state] = (agentsByState[state] || 0) + 1;
+      }
+      
+      // Count by rating
+      if (agent.rating && ratingLevels[agent.rating]) {
+        const rating = ratingLevels[agent.rating].label;
+        agentsByRating[rating] = (agentsByRating[rating] || 0) + 1;
+      }
+      
+      // Count by tags
+      agent.tags?.forEach(tag => {
+        agentsByTags[tag] = (agentsByTags[tag] || 0) + 1;
+      });
+    });
+    
+    return {
+      totalAgents,
+      agentsWithCoords,
+      mapCoverage: ((agentsWithCoords / totalAgents) * 100).toFixed(1),
+      agentsByState,
+      agentsByRating,
+      agentsByTags: Object.entries(agentsByTags)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 10) // Top 10 tags
+    };
+  };
+
+  // Export functions
+  const exportToCSV = () => {
+    const headers = ['Name', 'Brokerage', 'Phone', 'Email', 'Website', 'Service Area', 'Tags', 'Submitted By', 'Rating', 'Notes'];
+    const csvData = [
+      headers.join(','),
+      ...filteredAgents.map(agent => [
+        `"${agent.full_name}"`,
+        `"${agent.brokerage}"`,
+        `"${agent.phone}"`,
+        `"${agent.email}"`,
+        `"${agent.website}"`,
+        `"${agent.service_area}"`,
+        `"${agent.tags?.join('; ') || ''}"`,
+        `"${agent.submitted_by}"`,
+        `"${agent.rating ? ratingLevels[agent.rating]?.label || '' : ''}"`,
+        `"${agent.notes || ''}"`
+      ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `atlas-agents-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
   const authenticateAdmin = async (password) => {
     try {
       const response = await axios.post(`${API}/admin/auth`, { password });
