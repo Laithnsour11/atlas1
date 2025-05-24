@@ -385,7 +385,54 @@ function PremiumApp() {
     }
   };
 
-  // Analytics functions
+  // Tag Management functions
+  const fetchCustomTags = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/tags?password=admin123`);
+      setCustomTags(response.data.tags || []);
+    } catch (error) {
+      console.error('Error fetching custom tags:', error);
+    }
+  };
+
+  const addCustomTag = async () => {
+    if (!newTag.trim()) return;
+    
+    try {
+      const updatedTags = [...customTags, newTag.trim()];
+      const response = await axios.post(`${API}/admin/tags?password=admin123`, {
+        tags: updatedTags
+      });
+      
+      if (response.data.tags) {
+        setCustomTags(response.data.tags);
+        setPredefinedTags(response.data.tags); // Update the main tags list
+        setNewTag('');
+        alert('Tag added successfully!');
+      }
+    } catch (error) {
+      console.error('Error adding tag:', error);
+      alert('Error adding tag. Please try again.');
+    }
+  };
+
+  const removeCustomTag = async (tagToRemove) => {
+    try {
+      const updatedTags = customTags.filter(tag => tag !== tagToRemove);
+      const response = await axios.post(`${API}/admin/tags?password=admin123`, {
+        tags: updatedTags
+      });
+      
+      if (response.data.tags) {
+        setCustomTags(response.data.tags);
+        setPredefinedTags(response.data.tags); // Update the main tags list
+        alert('Tag removed successfully!');
+      }
+    } catch (error) {
+      console.error('Error removing tag:', error);
+      alert('Error removing tag. Please try again.');
+    }
+  };
   const generateAnalytics = () => {
     const totalAgents = agents.length;
     const agentsWithCoords = agents.filter(a => a.latitude && a.longitude).length;
