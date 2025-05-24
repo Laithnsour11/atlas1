@@ -109,6 +109,8 @@ function PremiumApp() {
       agent.longitude <= bounds.east + padding
     );
   };
+
+  // Extract state from service area
   const getStateFromServiceArea = (serviceArea) => {
     if (!serviceArea) return '';
     
