@@ -170,6 +170,8 @@ function PremiumApp() {
     
     return stateOutlines[state] || null;
   };
+
+  // Extract state from service area
   const getStateFromServiceArea = (serviceArea) => {
     if (!serviceArea) return '';
     
