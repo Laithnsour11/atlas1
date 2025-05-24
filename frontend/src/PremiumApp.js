@@ -60,6 +60,16 @@ function PremiumApp() {
     zoom: 10
   });
 
+  // Validate and update viewport safely
+  const updateViewport = (newViewport) => {
+    const validatedViewport = {
+      latitude: isNaN(newViewport.latitude) ? 40.7128 : Math.max(-85, Math.min(85, newViewport.latitude)),
+      longitude: isNaN(newViewport.longitude) ? -74.0060 : Math.max(-180, Math.min(180, newViewport.longitude)),
+      zoom: isNaN(newViewport.zoom) ? 10 : Math.max(0, Math.min(22, newViewport.zoom))
+    };
+    setViewport(validatedViewport);
+  };
+
   // Get rating icon and color
   const getRatingDisplay = (ratingKey) => {
     if (!ratingKey || !ratingLevels[ratingKey]) return null;
