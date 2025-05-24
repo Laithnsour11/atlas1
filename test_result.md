@@ -361,6 +361,42 @@ frontend:
         agent: "testing"
         comment: "COMPREHENSIVE TESTING COMPLETED - ALL MAJOR FEATURES WORKING! ✅ Premium UI Loading: Glass morphism design with Atlas branding loads perfectly. ✅ Agent Data: Fixed critical API integration issue (response.data.agents → response.data), now loading 26 agents successfully. ✅ New Rating System: Rating levels API working, descriptive tooltips implemented. ✅ Filter System: Apply/Reset pattern working with filter badges. ✅ Admin Settings: Password protection (admin123) working, authentication successful, admin options visible. ✅ Search Functionality: Working correctly. ✅ View Mode Controls: All 3 view modes functional. ✅ Responsive Design: Mobile layout working. ✅ Agent Cards: Premium glass morphism cards displaying names, brokerages, contact info, and tags. ✅ Profile Modals: View Profile buttons working. Minor: Modal close button had timeout issue but core functionality works. Fixed critical API data loading bug - frontend now properly receives agent data from backend."
 
+  - task: "Viewport-Based Filtering (Map View Only)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/PremiumApp.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL NEW FEATURE WORKING PERFECTLY - Viewport-based filtering implemented with 'Map View Only' button that appears in both map and both view modes. Button shows green active state when enabled, successfully filters agents to only show those in current map viewport, and works with map navigation (zoom/pan updates agent list). Feature allows users to focus on agents within their current map view area."
+
+  - task: "Enhanced Analytics Dashboard"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/PremiumApp.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL NEW FEATURE WORKING PERFECTLY - Comprehensive analytics dashboard accessible via Admin → View Analytics. Displays Total Agents (41), Map Coverage (26.8%), Filtered View count (41), detailed Agents by State breakdown (NY: 21, CA: 2, FL: 1, MA: 1, WA: 1, NJ: 1, IL: 1), Top Specialties distribution (Residential Sales: 26, Commercial Sales: 8, Luxury Properties: 8), and includes Export button for CSV download of current filtered view. Professional analytics interface with proper data visualization."
+
+  - task: "Export Functionality (CSV)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/PremiumApp.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ CRITICAL NEW FEATURE WORKING PERFECTLY - CSV export functionality implemented in both Admin Settings (Export Agents CSV) and Analytics Dashboard (Export Current View to CSV). Export includes all agent data with proper formatting: Name, Brokerage, Phone, Email, Website, Service Area, Tags, Submitted By, Rating, Notes. Exports currently filtered agents rather than all agents, providing targeted data export capabilities."
+
   - task: "New Rating System Backend API"
     implemented: true
     working: true
