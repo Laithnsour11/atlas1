@@ -433,6 +433,8 @@ function PremiumApp() {
       alert('Error removing tag. Please try again.');
     }
   };
+
+  // Analytics functions
   const generateAnalytics = () => {
     const totalAgents = agents.length;
     const agentsWithCoords = agents.filter(a => a.latitude && a.longitude).length;
