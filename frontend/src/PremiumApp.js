@@ -95,8 +95,13 @@ function PremiumApp() {
     };
   };
 
-  // Get coverage area radius based on service area type
+  // Get coverage area radius based on service area type (with validation)
   const getCoverageRadius = (serviceAreaType, zoom) => {
+    // Validate inputs
+    if (!serviceAreaType || typeof zoom !== 'number' || isNaN(zoom)) {
+      return { radius: 20, opacity: 0.15 };
+    }
+    
     const baseRadius = {
       'state': { min: 200, max: 400 },
       'county': { min: 50, max: 150 },
@@ -104,25 +109,35 @@ function PremiumApp() {
     };
     
     const range = baseRadius[serviceAreaType] || baseRadius['city'];
-    const zoomFactor = Math.max(0.1, Math.min(2, 16 - zoom) / 8);
+    const zoomFactor = Math.max(0.1, Math.min(2, (16 - zoom) / 8));
+    
+    const radius = Math.max(5, range.min + (range.max - range.min) * zoomFactor);
+    const opacity = serviceAreaType === 'state' ? 0.08 : serviceAreaType === 'county' ? 0.12 : 0.15;
     
     return {
-      radius: range.min + (range.max - range.min) * zoomFactor,
-      opacity: serviceAreaType === 'state' ? 0.08 : serviceAreaType === 'county' ? 0.12 : 0.15
+      radius: isNaN(radius) ? 20 : radius,
+      opacity: isNaN(opacity) ? 0.15 : opacity
     };
   };
 
-  // Group agents by service area to avoid overlapping coverage
+  // Group agents by service area to avoid overlapping coverage (with validation)
   const getGroupedCoverageAreas = () => {
     const groupedAreas = {};
     
     filteredAgents.forEach(agent => {
-      if (agent.latitude && agent.longitude) {
-        const key = `${agent.service_area_type}-${agent.service_area}`;
+      // Validate agent coordinates
+      if (agent.latitude && agent.longitude && 
+          !isNaN(agent.latitude) && !isNaN(agent.longitude) &&
+          agent.latitude >= -90 && agent.latitude <= 90 &&
+          agent.longitude >= -180 && agent.longitude <= 180) {
+        
+        const key = `${agent.service_area_type || 'city'}-${agent.service_area || 'unknown'}`;
         if (!groupedAreas[key]) {
           groupedAreas[key] = {
             ...agent,
-            agents: [agent]
+            agents: [agent],
+            service_area_type: agent.service_area_type || 'city',
+            service_area: agent.service_area || 'Unknown Area'
           };
         } else {
           groupedAreas[key].agents.push(agent);
