@@ -1140,14 +1140,24 @@ function PremiumApp() {
                 <div className="space-y-4">
                   <p className="text-green-600 font-medium">✓ Admin authenticated</p>
                   <div className="space-y-2">
-                    <button className="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-left">
-                      Manage Tags
+                    <button 
+                      onClick={() => {
+                        setAnalyticsData(generateAnalytics());
+                        setShowAnalytics(true);
+                        setShowSettings(false);
+                      }}
+                      className="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-left"
+                    >
+                      📊 View Analytics
+                    </button>
+                    <button 
+                      onClick={exportToCSV}
+                      className="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-left"
+                    >
+                      📥 Export Agents (CSV)
                     </button>
                     <button className="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-left">
-                      Export Data
-                    </button>
-                    <button className="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors text-left">
-                      Analytics
+                      🏷️ Manage Tags
                     </button>
                   </div>
                 </div>
