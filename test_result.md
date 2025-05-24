@@ -456,8 +456,7 @@ metadata:
 
 test_plan:
   current_focus: []
-  stuck_tasks:
-    - "Admin Tag Management System"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
