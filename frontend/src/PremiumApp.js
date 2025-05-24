@@ -95,7 +95,43 @@ function PremiumApp() {
     };
   };
 
-  // Helper function to check if agent is in viewport
+  // Get coverage area radius based on service area type
+  const getCoverageRadius = (serviceAreaType, zoom) => {
+    const baseRadius = {
+      'state': { min: 200, max: 400 },
+      'county': { min: 50, max: 150 },
+      'city': { min: 20, max: 80 }
+    };
+    
+    const range = baseRadius[serviceAreaType] || baseRadius['city'];
+    const zoomFactor = Math.max(0.1, Math.min(2, 16 - zoom) / 8);
+    
+    return {
+      radius: range.min + (range.max - range.min) * zoomFactor,
+      opacity: serviceAreaType === 'state' ? 0.08 : serviceAreaType === 'county' ? 0.12 : 0.15
+    };
+  };
+
+  // Group agents by service area to avoid overlapping coverage
+  const getGroupedCoverageAreas = () => {
+    const groupedAreas = {};
+    
+    filteredAgents.forEach(agent => {
+      if (agent.latitude && agent.longitude) {
+        const key = `${agent.service_area_type}-${agent.service_area}`;
+        if (!groupedAreas[key]) {
+          groupedAreas[key] = {
+            ...agent,
+            agents: [agent]
+          };
+        } else {
+          groupedAreas[key].agents.push(agent);
+        }
+      }
+    });
+    
+    return Object.values(groupedAreas);
+  };
   const isAgentInViewport = (agent) => {
     if (!agent.latitude || !agent.longitude) return false;
     
