@@ -115,7 +115,61 @@ function PremiumApp() {
     );
   };
 
-  // Extract state from service area
+  // Get state outline SVG
+  const getStateOutlineSVG = (state) => {
+    const stateOutlines = {
+      'NY': (
+        <svg viewBox="0 0 100 100" className="w-8 h-8 text-blue-600 opacity-30">
+          <path d="M20,30 L30,20 L70,25 L85,35 L80,45 L85,55 L75,65 L60,70 L45,75 L35,80 L25,75 L15,65 L10,50 L15,40 Z" 
+                fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        </svg>
+      ),
+      'CA': (
+        <svg viewBox="0 0 100 100" className="w-8 h-8 text-blue-600 opacity-30">
+          <path d="M30,15 L35,20 L40,30 L45,40 L50,50 L55,60 L60,70 L55,80 L45,85 L35,80 L25,70 L20,60 L15,50 L20,40 L25,30 Z" 
+                fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        </svg>
+      ),
+      'FL': (
+        <svg viewBox="0 0 100 100" className="w-8 h-8 text-blue-600 opacity-30">
+          <path d="M50,20 L60,25 L70,35 L75,45 L80,55 L85,65 L80,75 L70,80 L60,75 L50,70 L40,75 L30,70 L25,60 L30,50 L35,40 L40,30 L45,25 Z" 
+                fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        </svg>
+      ),
+      'IL': (
+        <svg viewBox="0 0 100 100" className="w-8 h-8 text-blue-600 opacity-30">
+          <path d="M40,15 L45,20 L50,30 L55,40 L50,50 L55,60 L50,70 L45,80 L40,75 L35,65 L30,55 L35,45 L30,35 L35,25 Z" 
+                fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        </svg>
+      ),
+      'MA': (
+        <svg viewBox="0 0 100 100" className="w-8 h-8 text-blue-600 opacity-30">
+          <path d="M25,40 L35,35 L45,40 L55,35 L65,40 L70,50 L65,60 L55,65 L45,60 L35,65 L25,60 L20,50 Z" 
+                fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        </svg>
+      ),
+      'WA': (
+        <svg viewBox="0 0 100 100" className="w-8 h-8 text-blue-600 opacity-30">
+          <path d="M15,30 L25,25 L35,30 L45,25 L55,30 L65,25 L75,30 L80,40 L75,50 L65,55 L55,50 L45,55 L35,50 L25,55 L15,50 L10,40 Z" 
+                fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        </svg>
+      ),
+      'PA': (
+        <svg viewBox="0 0 100 100" className="w-8 h-8 text-blue-600 opacity-30">
+          <path d="M20,35 L30,30 L50,35 L70,30 L80,40 L75,50 L70,60 L50,65 L30,60 L20,50 Z" 
+                fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        </svg>
+      ),
+      'NJ': (
+        <svg viewBox="0 0 100 100" className="w-8 h-8 text-blue-600 opacity-30">
+          <path d="M45,20 L55,25 L60,35 L65,45 L60,55 L55,65 L50,75 L45,70 L40,60 L35,50 L40,40 L35,30 Z" 
+                fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+        </svg>
+      )
+    };
+    
+    return stateOutlines[state] || null;
+  };
   const getStateFromServiceArea = (serviceArea) => {
     if (!serviceArea) return '';
     
