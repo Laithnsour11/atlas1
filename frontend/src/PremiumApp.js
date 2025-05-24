@@ -386,7 +386,7 @@ function PremiumApp() {
 
   const handleSuggestionClick = (suggestion) => {
     setSearchTerm(suggestion.text);
-    setViewport({
+    updateViewport({
       latitude: suggestion.latitude,
       longitude: suggestion.longitude,
       zoom: 12
