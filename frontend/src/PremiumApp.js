@@ -1115,38 +1115,44 @@ function PremiumApp() {
                   )
                 ))}
 
-                {/* Coverage Areas - Heat Map Visualization */}
-                {filteredAgents.map((agent) => (
-                  agent.latitude && agent.longitude && (
+                {/* Coverage Areas - Grouped by Service Area */}
+                {getGroupedCoverageAreas().map((areaGroup) => {
+                  const coverage = getCoverageRadius(areaGroup.service_area_type, viewport.zoom);
+                  return (
                     <Source
-                      key={`coverage-split-${agent.id}`}
-                      id={`coverage-split-${agent.id}`}
+                      key={`coverage-split-${areaGroup.service_area_type}-${areaGroup.service_area}`}
+                      id={`coverage-split-${areaGroup.service_area_type}-${areaGroup.service_area}`}
                       type="geojson"
                       data={{
                         type: "Feature",
                         geometry: {
                           type: "Point",
-                          coordinates: [agent.longitude, agent.latitude]
+                          coordinates: [areaGroup.longitude, areaGroup.latitude]
+                        },
+                        properties: {
+                          serviceArea: areaGroup.service_area,
+                          serviceAreaType: areaGroup.service_area_type,
+                          agentCount: areaGroup.agents.length
                         }
                       }}
                     >
                       <Layer
-                        id={`coverage-circle-split-${agent.id}`}
+                        id={`coverage-circle-split-${areaGroup.service_area_type}-${areaGroup.service_area}`}
                         type="circle"
                         paint={{
-                          'circle-radius': {
-                            stops: [[8, 4], [12, 12], [16, 25]]
-                          },
-                          'circle-color': '#3B82F6',
-                          'circle-opacity': 0.12,
+                          'circle-radius': coverage.radius * 0.8, // Slightly smaller for split view
+                          'circle-color': areaGroup.service_area_type === 'state' ? '#8B5CF6' : 
+                                         areaGroup.service_area_type === 'county' ? '#3B82F6' : '#10B981',
+                          'circle-opacity': coverage.opacity * 0.8,
                           'circle-stroke-width': 1,
-                          'circle-stroke-color': '#2563EB',
-                          'circle-stroke-opacity': 0.25
+                          'circle-stroke-color': areaGroup.service_area_type === 'state' ? '#7C3AED' : 
+                                               areaGroup.service_area_type === 'county' ? '#2563EB' : '#059669',
+                          'circle-stroke-opacity': 0.3
                         }}
                       />
                     </Source>
-                  )
-                ))}
+                  );
+                })}
               </MapboxMap>
             </div>
           </div>
