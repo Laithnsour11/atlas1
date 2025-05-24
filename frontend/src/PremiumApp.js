@@ -1761,6 +1761,104 @@ function PremiumApp() {
           </div>
         </div>
       )}
+
+      {/* Analytics Modal */}
+      {showAnalytics && analyticsData && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-900">📊 Atlas Analytics Dashboard</h2>
+                <button
+                  onClick={() => setShowAnalytics(false)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                {/* Key Metrics */}
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-slate-900 mb-2">📈 Total Agents</h3>
+                  <p className="text-3xl font-bold text-blue-600">{analyticsData.totalAgents}</p>
+                </div>
+                
+                <div className="bg-green-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-slate-900 mb-2">🗺️ Map Coverage</h3>
+                  <p className="text-3xl font-bold text-green-600">{analyticsData.mapCoverage}%</p>
+                  <p className="text-sm text-slate-600">{analyticsData.agentsWithCoords} agents with coordinates</p>
+                </div>
+                
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-slate-900 mb-2">🏢 Filtered View</h3>
+                  <p className="text-3xl font-bold text-purple-600">{filteredAgents.length}</p>
+                  <p className="text-sm text-slate-600">Currently visible agents</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                {/* Agents by State */}
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">🗺️ Agents by State</h3>
+                  <div className="space-y-2">
+                    {Object.entries(analyticsData.agentsByState)
+                      .sort(([,a], [,b]) => b - a)
+                      .map(([state, count]) => (
+                        <div key={state} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                          <span className="font-medium">{state}</span>
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                            {count}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                {/* Top Specialties */}
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">🏷️ Top Specialties</h3>
+                  <div className="space-y-2">
+                    {analyticsData.agentsByTags.map(([tag, count]) => (
+                      <div key={tag} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                        <span className="font-medium text-sm">{tag}</span>
+                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                          {count}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Ratings Distribution */}
+              {Object.keys(analyticsData.agentsByRating).length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">⭐ Ratings Distribution</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {Object.entries(analyticsData.agentsByRating).map(([rating, count]) => (
+                      <div key={rating} className="text-center p-4 bg-slate-50 rounded-lg">
+                        <p className="font-medium text-slate-900">{rating}</p>
+                        <p className="text-2xl font-bold text-indigo-600">{count}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="mt-8 flex justify-center">
+                <button
+                  onClick={exportToCSV}
+                  className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
+                >
+                  📥 Export Current View to CSV
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
