@@ -634,7 +634,7 @@ function PremiumApp() {
                 }`}
               >
                 <Eye className="w-4 h-4 mr-2" />
-                My Agents
+                Submissions
               </button>
               <button
                 onClick={() => setShowSettings(true)}
