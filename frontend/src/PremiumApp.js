@@ -982,16 +982,18 @@ function PremiumApp() {
           <div className="h-[70vh] bg-white/60 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
             <MapboxMap
               {...viewport}
-              onMove={evt => setViewport(evt.viewState)}
+              onMove={evt => updateViewport(evt.viewState)}
               style={{width: '100%', height: '100%'}}
               mapStyle="mapbox://styles/mapbox/light-v11"
               mapboxAccessToken={MAPBOX_TOKEN}
+              onError={(e) => console.error('Mapbox error:', e)}
             >
               <NavigationControl position="top-right" />
               
               {/* Agent Markers */}
               {filteredAgents.map((agent) => (
-                agent.latitude && agent.longitude && (
+                agent.latitude && agent.longitude && 
+                !isNaN(agent.latitude) && !isNaN(agent.longitude) && (
                   <Marker
                     key={agent.id}
                     latitude={agent.latitude}
