@@ -90,7 +90,25 @@ function PremiumApp() {
     };
   };
 
-  // Extract state from service area
+  // Helper function to check if agent is in viewport
+  const isAgentInViewport = (agent) => {
+    if (!agent.latitude || !agent.longitude) return false;
+    
+    const padding = 0.01; // Small padding for edge cases
+    const bounds = {
+      north: viewport.latitude + (viewport.zoom > 10 ? 0.1 : 0.5),
+      south: viewport.latitude - (viewport.zoom > 10 ? 0.1 : 0.5),
+      east: viewport.longitude + (viewport.zoom > 10 ? 0.1 : 0.5),
+      west: viewport.longitude - (viewport.zoom > 10 ? 0.1 : 0.5)
+    };
+    
+    return (
+      agent.latitude >= bounds.south - padding &&
+      agent.latitude <= bounds.north + padding &&
+      agent.longitude >= bounds.west - padding &&
+      agent.longitude <= bounds.east + padding
+    );
+  };
   const getStateFromServiceArea = (serviceArea) => {
     if (!serviceArea) return '';
     
