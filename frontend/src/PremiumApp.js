@@ -1981,6 +1981,82 @@ function PremiumApp() {
           </div>
         </div>
       )}
+
+      {/* Tag Management Modal */}
+      {showTagManagement && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-slate-900">🏷️ Manage Tags</h2>
+                <button
+                  onClick={() => setShowTagManagement(false)}
+                  className="text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Add New Tag */}
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                <h3 className="font-semibold text-slate-900 mb-3">Add New Tag</h3>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    placeholder="Enter new tag name..."
+                    className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        addCustomTag();
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={addCustomTag}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+
+              {/* Current Tags */}
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-3">Current Tags ({customTags.length})</h3>
+                <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                  {customTags.map((tag, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                      <span className="font-medium text-slate-900">{tag}</span>
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`Are you sure you want to remove "${tag}"?`)) {
+                            removeCustomTag(tag);
+                          }
+                        }}
+                        className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={() => setShowTagManagement(false)}
+                  className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
