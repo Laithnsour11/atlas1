@@ -1011,76 +1011,90 @@ function PremiumApp() {
         {viewMode === 'map' && (
           /* Full Screen Map */
           <div className="h-[70vh] bg-white/60 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-            <MapboxMap
-              {...viewport}
-              onMove={evt => updateViewport(evt.viewState)}
-              style={{width: '100%', height: '100%'}}
-              mapStyle="mapbox://styles/mapbox/light-v11"
-              mapboxAccessToken={MAPBOX_TOKEN}
-              onError={(e) => console.error('Mapbox error:', e)}
-            >
-              <NavigationControl position="top-right" />
-              
-              {/* Agent Markers */}
-              {filteredAgents.map((agent) => (
-                agent.latitude && agent.longitude && 
-                !isNaN(agent.latitude) && !isNaN(agent.longitude) && (
-                  <Marker
-                    key={agent.id}
-                    latitude={agent.latitude}
-                    longitude={agent.longitude}
-                    anchor="bottom"
-                  >
-                    <div 
-                      className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full border-3 border-white shadow-lg cursor-pointer hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center transform hover:scale-110"
-                      onClick={() => setSelectedAgent(agent)}
-                      title={agent.full_name}
-                    >
-                      <User className="w-5 h-5 text-white" />
-                    </div>
-                  </Marker>
-                )
-              ))}
+            <div style={{ width: '100%', height: '100%' }}>
+              <MapboxMap
+                {...viewport}
+                onMove={evt => {
+                  if (mapLoaded) {
+                    updateViewport(evt.viewState);
+                  }
+                }}
+                onLoad={handleMapLoad}
+                style={{width: '100%', height: '100%'}}
+                mapStyle="mapbox://styles/mapbox/light-v11"
+                mapboxAccessToken={MAPBOX_TOKEN}
+                onError={(e) => console.error('Mapbox error:', e)}
+                attributionControl={true}
+                interactive={mapLoaded}
+              >
+                <NavigationControl position="top-right" />
+                
+                {/* Only render markers and layers after map is loaded */}
+                {mapLoaded && (
+                  <>
+                    {/* Agent Markers */}
+                    {filteredAgents.map((agent) => (
+                      agent.latitude && agent.longitude && 
+                      !isNaN(agent.latitude) && !isNaN(agent.longitude) && (
+                        <Marker
+                          key={agent.id}
+                          latitude={agent.latitude}
+                          longitude={agent.longitude}
+                          anchor="bottom"
+                        >
+                          <div 
+                            className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full border-3 border-white shadow-lg cursor-pointer hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center transform hover:scale-110"
+                            onClick={() => setSelectedAgent(agent)}
+                            title={agent.full_name}
+                          >
+                            <User className="w-5 h-5 text-white" />
+                          </div>
+                        </Marker>
+                      )
+                    ))}
 
-              {/* Coverage Areas - Grouped by Service Area */}
-              {getGroupedCoverageAreas().map((areaGroup) => {
-                const coverage = getCoverageRadius(areaGroup.service_area_type, viewport.zoom);
-                return (
-                  <Source
-                    key={`coverage-${areaGroup.service_area_type}-${areaGroup.service_area}`}
-                    id={`coverage-${areaGroup.service_area_type}-${areaGroup.service_area}`}
-                    type="geojson"
-                    data={{
-                      type: "Feature",
-                      geometry: {
-                        type: "Point",
-                        coordinates: [areaGroup.longitude, areaGroup.latitude]
-                      },
-                      properties: {
-                        serviceArea: areaGroup.service_area,
-                        serviceAreaType: areaGroup.service_area_type,
-                        agentCount: areaGroup.agents.length
-                      }
-                    }}
-                  >
-                    <Layer
-                      id={`coverage-circle-${areaGroup.service_area_type}-${areaGroup.service_area}`}
-                      type="circle"
-                      paint={{
-                        'circle-radius': coverage.radius,
-                        'circle-color': areaGroup.service_area_type === 'state' ? '#8B5CF6' : 
-                                       areaGroup.service_area_type === 'county' ? '#3B82F6' : '#10B981',
-                        'circle-opacity': coverage.opacity,
-                        'circle-stroke-width': 2,
-                        'circle-stroke-color': areaGroup.service_area_type === 'state' ? '#7C3AED' : 
-                                             areaGroup.service_area_type === 'county' ? '#2563EB' : '#059669',
-                        'circle-stroke-opacity': 0.4
-                      }}
-                    />
-                  </Source>
-                );
-              })}
-            </MapboxMap>
+                    {/* Coverage Areas - Grouped by Service Area */}
+                    {getGroupedCoverageAreas().map((areaGroup) => {
+                      const coverage = getCoverageRadius(areaGroup.service_area_type, viewport.zoom);
+                      return (
+                        <Source
+                          key={`coverage-${areaGroup.service_area_type}-${areaGroup.service_area}`}
+                          id={`coverage-${areaGroup.service_area_type}-${areaGroup.service_area}`}
+                          type="geojson"
+                          data={{
+                            type: "Feature",
+                            geometry: {
+                              type: "Point",
+                              coordinates: [areaGroup.longitude, areaGroup.latitude]
+                            },
+                            properties: {
+                              serviceArea: areaGroup.service_area,
+                              serviceAreaType: areaGroup.service_area_type,
+                              agentCount: areaGroup.agents.length
+                            }
+                          }}
+                        >
+                          <Layer
+                            id={`coverage-circle-${areaGroup.service_area_type}-${areaGroup.service_area}`}
+                            type="circle"
+                            paint={{
+                              'circle-radius': coverage.radius,
+                              'circle-color': areaGroup.service_area_type === 'state' ? '#8B5CF6' : 
+                                             areaGroup.service_area_type === 'county' ? '#3B82F6' : '#10B981',
+                              'circle-opacity': coverage.opacity,
+                              'circle-stroke-width': 2,
+                              'circle-stroke-color': areaGroup.service_area_type === 'state' ? '#7C3AED' : 
+                                                   areaGroup.service_area_type === 'county' ? '#2563EB' : '#059669',
+                              'circle-stroke-opacity': 0.4
+                            }}
+                          />
+                        </Source>
+                      );
+                    })}
+                  </>
+                )}
+              </MapboxMap>
+            </div>
           </div>
         )}
 
