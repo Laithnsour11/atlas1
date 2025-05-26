@@ -59,6 +59,8 @@ function PremiumApp() {
     longitude: -74.0060,
     zoom: 10
   });
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapInstance, setMapInstance] = useState(null);
 
   // Validate and update viewport safely
   const updateViewport = (newViewport) => {
@@ -68,6 +70,35 @@ function PremiumApp() {
       zoom: isNaN(newViewport.zoom) ? 10 : Math.max(0, Math.min(22, newViewport.zoom))
     };
     setViewport(validatedViewport);
+  };
+
+  // Handle map load event
+  const handleMapLoad = (event) => {
+    const map = event.target;
+    setMapInstance(map);
+    setMapLoaded(true);
+    
+    // Ensure map has proper dimensions
+    setTimeout(() => {
+      if (map && typeof map.resize === 'function') {
+        map.resize();
+      }
+    }, 100);
+  };
+
+  // Safe map operation wrapper
+  const safeMapOperation = (operation) => {
+    if (!mapLoaded || !mapInstance) {
+      console.warn('Map not ready for operation');
+      return null;
+    }
+    
+    try {
+      return operation(mapInstance);
+    } catch (error) {
+      console.warn('Map operation failed:', error);
+      return null;
+    }
   };
 
   // Get rating icon and color
