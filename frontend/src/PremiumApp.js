@@ -672,6 +672,20 @@ function PremiumApp() {
     }
   };
 
+  // Handle view mode changes and resize map
+  useEffect(() => {
+    if (mapInstance && mapLoaded) {
+      // Resize map when view mode changes
+      setTimeout(() => {
+        safeMapOperation((map) => {
+          if (map.getContainer().offsetWidth > 0 && map.getContainer().offsetHeight > 0) {
+            map.resize();
+          }
+        });
+      }, 100);
+    }
+  }, [viewMode, mapInstance, mapLoaded]);
+
   // Load comments when contact modal opens
   useEffect(() => {
     if (showContactModal && contactingAgent) {
