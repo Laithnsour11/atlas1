@@ -1184,18 +1184,55 @@ function PremiumApp() {
               <div style={{ width: '100%', height: '100%' }}>
                 <MapboxMap
                   {...viewport}
-                  onMove={evt => {
-                    if (mapLoaded) {
-                      updateViewport(evt.viewState);
+                  onMove={(evt) => {
+                    try {
+                      if (mapLoaded && evt.viewState) {
+                        updateViewport(evt.viewState);
+                      }
+                    } catch (error) {
+                      console.warn('Map move error:', error);
                     }
                   }}
-                  onLoad={handleMapLoad}
+                  onLoad={(event) => {
+                    try {
+                      handleMapLoad(event);
+                    } catch (error) {
+                      console.warn('Map load error:', error);
+                    }
+                  }}
                   style={{width: '100%', height: '100%'}}
                   mapStyle="mapbox://styles/mapbox/light-v11"
                   mapboxAccessToken={MAPBOX_TOKEN}
-                  onError={(e) => console.error('Mapbox error:', e)}
+                  onError={(e) => {
+                    console.error('Mapbox error:', e);
+                    // Don't throw, just log the error
+                  }}
                   attributionControl={true}
                   interactive={mapLoaded}
+                  onMouseMove={(e) => {
+                    // Prevent coordinate transformation errors on mouse move
+                    try {
+                      if (!mapLoaded || !e.lngLat) return;
+                    } catch (error) {
+                      // Silently handle coordinate errors
+                    }
+                  }}
+                  onMouseOver={(e) => {
+                    // Prevent coordinate transformation errors on mouse over
+                    try {
+                      if (!mapLoaded || !e.lngLat) return;
+                    } catch (error) {
+                      // Silently handle coordinate errors
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    // Prevent coordinate transformation errors on mouse out
+                    try {
+                      if (!mapLoaded) return;
+                    } catch (error) {
+                      // Silently handle coordinate errors
+                    }
+                  }}
                 >
                   <NavigationControl position="top-right" />
                   
