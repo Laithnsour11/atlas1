@@ -1165,14 +1165,22 @@ function PremiumApp() {
                   {/* Only render markers and layers after map is loaded */}
                   {mapLoaded && (
                     <>
-                      {/* Agent Markers */}
-                      {filteredAgents.map((agent) => (
-                        agent.latitude && agent.longitude && 
-                        !isNaN(agent.latitude) && !isNaN(agent.longitude) && (
+                      {/* Agent Markers - with enhanced coordinate validation */}
+                      {filteredAgents.map((agent) => {
+                        // Enhanced coordinate validation
+                        const lat = parseFloat(agent.latitude);
+                        const lng = parseFloat(agent.longitude);
+                        
+                        if (!lat || !lng || isNaN(lat) || isNaN(lng) || 
+                            lat < -85 || lat > 85 || lng < -180 || lng > 180) {
+                          return null;
+                        }
+                        
+                        return (
                           <Marker
                             key={agent.id}
-                            latitude={agent.latitude}
-                            longitude={agent.longitude}
+                            latitude={lat}
+                            longitude={lng}
                             anchor="bottom"
                           >
                             <div 
@@ -1183,47 +1191,11 @@ function PremiumApp() {
                               <User className="w-4 h-4 text-white" />
                             </div>
                           </Marker>
-                        )
-                      ))}
-
-                      {/* Coverage Areas - Grouped by Service Area */}
-                      {getGroupedCoverageAreas().map((areaGroup) => {
-                        const coverage = getCoverageRadius(areaGroup.service_area_type, viewport.zoom);
-                        return (
-                          <Source
-                            key={`coverage-split-${areaGroup.service_area_type}-${areaGroup.service_area}`}
-                            id={`coverage-split-${areaGroup.service_area_type}-${areaGroup.service_area}`}
-                            type="geojson"
-                            data={{
-                              type: "Feature",
-                              geometry: {
-                                type: "Point",
-                                coordinates: [areaGroup.longitude, areaGroup.latitude]
-                              },
-                              properties: {
-                                serviceArea: areaGroup.service_area,
-                                serviceAreaType: areaGroup.service_area_type,
-                                agentCount: areaGroup.agents.length
-                              }
-                            }}
-                          >
-                            <Layer
-                              id={`coverage-circle-split-${areaGroup.service_area_type}-${areaGroup.service_area}`}
-                              type="circle"
-                              paint={{
-                                'circle-radius': coverage.radius * 0.8, // Slightly smaller for split view
-                                'circle-color': areaGroup.service_area_type === 'state' ? '#8B5CF6' : 
-                                               areaGroup.service_area_type === 'county' ? '#3B82F6' : '#10B981',
-                                'circle-opacity': coverage.opacity * 0.8,
-                                'circle-stroke-width': 1,
-                                'circle-stroke-color': areaGroup.service_area_type === 'state' ? '#7C3AED' : 
-                                                     areaGroup.service_area_type === 'county' ? '#2563EB' : '#059669',
-                                'circle-stroke-opacity': 0.3
-                              }}
-                            />
-                          </Source>
                         );
                       })}
+
+                      {/* Coverage Areas - Temporarily Disabled to Fix Coordinate Errors */}
+                      {/* Coverage areas causing coordinate transformation errors - will be re-enabled with fix */}
                     </>
                   )}
                 </MapboxMap>
