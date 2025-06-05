@@ -1,0 +1,16 @@
+{
+  "name": "Atlas by deal flow",
+  "short_name": "Atlas",
+  "description": "Real Estate Agent Directory",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
